@@ -7,6 +7,7 @@ namespace Vulkan
 	class QueueFamilyProperties
 	{
 	public:
+		inline QueueFamilyProperties();
 		inline QueueFamilyProperties(const VkQueueFamilyProperties& properties);
 
 		inline const uint32_t& GetQueueCount() const;
@@ -21,6 +22,11 @@ namespace Vulkan
 
 		VkQueueFamilyProperties internal;
 	};
+
+	inline QueueFamilyProperties::QueueFamilyProperties() : internal()
+	{
+
+	}
 
 	inline QueueFamilyProperties::QueueFamilyProperties(const VkQueueFamilyProperties& properties) : internal(properties)
 	{

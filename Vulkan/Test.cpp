@@ -18,7 +18,7 @@ int main()
 
 	Vulkan::InstanceProperties properties = {};
 	properties.applicationInfo = appInfo;
-	properties.extensions = {"VK_EXT_DEBUG_REPORT_EXTENSION_NAME"};
+	properties.extensions = {};
 	properties.layers = {};
 
 	Vulkan::Instance instance(properties);

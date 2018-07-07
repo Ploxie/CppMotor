@@ -48,14 +48,14 @@ namespace Vulkan
 #ifdef NDEBUG
 		const bool enableValidationLayer = false;
 #else
-		const bool enableValidationLayer = false; // FIX
+		const bool enableValidationLayer = true; // FIX
 #endif
 
-		SetupDebugging();
+		//SetupDebugging();
 
 		if (enableValidationLayer)
 		{
-			extensions.push_back("VK_EXT_DEBUG_REPORT_EXTENSION_NAME");
+			//extensions.push_back("VK_EXT_DEBUG_REPORT_EXTENSION_NAME");
 			layers.push_back("VK_LAYER_LUNARG_standard_validation");
 		}
 		
@@ -109,13 +109,13 @@ namespace Vulkan
 	
 	void Instance::SetupDebugging(const DebugReportCallback& callback)
 	{
-		VkDebugReportCallbackCreateInfoEXT createInfo = {};
+		/*VkDebugReportCallbackCreateInfoEXT createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
 		createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 		createInfo.pfnCallback = callback.invoke;
 		
 		if (Debug::CreateDebugReportCallbackEXT(internal, &createInfo, nullptr, this->callback) != VK_SUCCESS) {
 			throw std::runtime_error("failed to set up debug callback!");
-		}
+		}*/
 	}
 }

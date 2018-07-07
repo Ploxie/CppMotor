@@ -149,6 +149,9 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="DebugReportCallback.h" />
+    <ClInclude Include="DefaultDebugReportCallback.h" />
     <ClInclude Include="InstanceProperties.h" />
     <ClInclude Include="QueueFamilyProperties.h" />
     <ClInclude Include="Version.h" />

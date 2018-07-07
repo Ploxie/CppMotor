@@ -36,5 +36,14 @@
     <ClInclude Include="QueueFamilyProperties.h">
       <Filter>Instance</Filter>
     </ClInclude>
+    <ClInclude Include="DebugReportCallback.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultDebugReportCallback.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
