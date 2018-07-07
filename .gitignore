@@ -1,3 +1,5 @@
+
+
 # Prerequisites
 *.d
 
@@ -43,3 +45,6 @@
 *.opendb
 *.suo
 *.ilk
+
+!/libs/x86/*
+!/libs/x64/*
