@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Instance.cpp">
+      <Filter>Instance</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Instance">
+      <UniqueIdentifier>{eaa31fd7-2020-48fa-a3c0-b288d95694c0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Instance.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
