@@ -5,14 +5,35 @@
     <ClCompile Include="Instance.cpp">
       <Filter>Instance</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicalDevice.cpp">
+      <Filter>Device</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Instance">
       <UniqueIdentifier>{eaa31fd7-2020-48fa-a3c0-b288d95694c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Device">
+      <UniqueIdentifier>{79f2f669-5ccf-4b8e-a8f3-e2921ccf9dee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Instance.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicalDevice.h">
+      <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationInfo.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="Version.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceProperties.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="QueueFamilyProperties.h">
       <Filter>Instance</Filter>
     </ClInclude>
   </ItemGroup>

@@ -73,14 +73,14 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(Platform)\</IntDir>
     <TargetName>$(ProjectName)$(Platform)</TargetName>
-    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath);..\Utilities;</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib32;..\libs\x86\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(Platform)\</IntDir>
     <TargetName>$(ProjectName)$(Platform)</TargetName>
-    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath);..\Utilities;</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib;..\libs\x64\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,7 +110,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies);Utilities$(Platform).lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,10 +145,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Instance.cpp" />
+    <ClCompile Include="PhysicalDevice.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="InstanceProperties.h" />
+    <ClInclude Include="QueueFamilyProperties.h" />
+    <ClInclude Include="Version.h" />
     <ClInclude Include="Instance.h" />
+    <ClInclude Include="PhysicalDevice.h" />
+    <ClInclude Include="ApplicationInfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
