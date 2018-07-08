@@ -147,17 +147,17 @@
     <ClCompile Include="Instance.cpp" />
     <ClCompile Include="PhysicalDevice.cpp" />
     <ClCompile Include="Test.cpp" />
+    <ClCompile Include="VulkanUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Debug.h" />
     <ClInclude Include="DebugReportCallback.h" />
-    <ClInclude Include="DefaultDebugReportCallback.h" />
     <ClInclude Include="InstanceProperties.h" />
     <ClInclude Include="QueueFamilyProperties.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="Instance.h" />
     <ClInclude Include="PhysicalDevice.h" />
     <ClInclude Include="ApplicationInfo.h" />
+    <ClInclude Include="VulkanUtil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

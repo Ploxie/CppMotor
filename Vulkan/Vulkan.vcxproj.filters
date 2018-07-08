@@ -8,6 +8,9 @@
     <ClCompile Include="PhysicalDevice.cpp">
       <Filter>Device</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanUtil.cpp">
+      <Filter>Instance</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Instance">
@@ -39,10 +42,7 @@
     <ClInclude Include="DebugReportCallback.h">
       <Filter>Instance</Filter>
     </ClInclude>
-    <ClInclude Include="DefaultDebugReportCallback.h">
-      <Filter>Instance</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.h">
+    <ClInclude Include="VulkanUtil.h">
       <Filter>Instance</Filter>
     </ClInclude>
   </ItemGroup>

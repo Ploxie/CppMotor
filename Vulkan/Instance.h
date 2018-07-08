@@ -18,13 +18,11 @@ namespace Vulkan
 
 		const std::vector<PhysicalDevice>& GetPhysicalDevices() const;
 
-		void SetupDebugging(const DebugReportCallback& callback);
-
 	private:
 
 		VkInstance internal;
 		std::vector<PhysicalDevice> physicalDevices;
 
-		VkDebugReportCallbackEXT* callback;
+		DebugReportCallback* callback;
 	};
 }
