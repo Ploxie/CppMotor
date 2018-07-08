@@ -11,6 +11,9 @@
     <ClCompile Include="VulkanUtil.cpp">
       <Filter>Instance</Filter>
     </ClCompile>
+    <ClCompile Include="LogicalDevice.cpp">
+      <Filter>Device</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Instance">
@@ -44,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="VulkanUtil.h">
       <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicalDevice.h">
+      <Filter>Device</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

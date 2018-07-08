@@ -8,12 +8,13 @@ namespace Vulkan
 	class DebugReportCallback
 	{
 	public:
-		DebugReportCallback();
-		DebugReportCallback(const VkInstance& instance);
+		inline DebugReportCallback();
+		inline DebugReportCallback(const VkInstance& instance);
 				
 		inline void Destroy(const VkInstance& instance);
 
 	protected:
+		bool created;
 		VkDebugReportCallbackEXT callback;
 	};
 
@@ -32,7 +33,7 @@ namespace Vulkan
 		return VK_FALSE;
 	}
 
-	VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback) {
+	 static VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback) {
 		auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
 		if (func != nullptr) {
 			return func(instance, pCreateInfo, pAllocator, pCallback);
@@ -42,19 +43,19 @@ namespace Vulkan
 		}
 	}
 
-	void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator) {
+	 static void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator) {
 		auto func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT");
 		if (func != nullptr) {
 			func(instance, callback, pAllocator);
 		}
 	}
 
-	DebugReportCallback::DebugReportCallback()
+	inline DebugReportCallback::DebugReportCallback()
 	{
-
+		created = false;
 	}
 
-	DebugReportCallback::DebugReportCallback(const VkInstance& instance)
+	inline DebugReportCallback::DebugReportCallback(const VkInstance& instance)
 	{		
 		VkDebugReportCallbackCreateInfoEXT createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
@@ -66,11 +67,16 @@ namespace Vulkan
 		{
 			std::cerr << "Failed to setup debug callback: " << translateVulkanResult(result) << std::endl;
 		}
+
+		created = true;
 	}
 
 	inline void DebugReportCallback::Destroy(const VkInstance& instance)
 	{
-		DestroyDebugReportCallbackEXT(instance, callback, 0);
+		if (created)
+		{		
+			DestroyDebugReportCallbackEXT(instance, callback, 0);
+		}
 	}
 
 	

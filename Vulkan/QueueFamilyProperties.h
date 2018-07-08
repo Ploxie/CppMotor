@@ -8,8 +8,9 @@ namespace Vulkan
 	{
 	public:
 		inline QueueFamilyProperties();
-		inline QueueFamilyProperties(const VkQueueFamilyProperties& properties);
+		inline QueueFamilyProperties(const uint& index, const VkQueueFamilyProperties& properties);
 
+		inline const uint& GetIndex() const;
 		inline const uint32_t& GetQueueCount() const;
 
 		inline const bool HasGraphicsCapabilities() const;
@@ -20,6 +21,7 @@ namespace Vulkan
 	private:
 		inline const bool HasBit(const uint& bit) const;
 
+		uint index;
 		VkQueueFamilyProperties internal;
 	};
 
@@ -28,9 +30,14 @@ namespace Vulkan
 
 	}
 
-	inline QueueFamilyProperties::QueueFamilyProperties(const VkQueueFamilyProperties& properties) : internal(properties)
+	inline QueueFamilyProperties::QueueFamilyProperties(const uint& index, const VkQueueFamilyProperties& properties) : index(index), internal(properties)
 	{
 
+	}
+
+	inline const uint& QueueFamilyProperties::GetIndex() const
+	{
+		return index;
 	}
 
 	inline const uint32_t& QueueFamilyProperties::GetQueueCount() const

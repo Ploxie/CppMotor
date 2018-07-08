@@ -5,7 +5,6 @@
 #include <vector>
 #include <iostream>
 #include "InstanceProperties.h"
-#include "DebugReportCallback.h"
 #include "VulkanUtil.h"
 
 namespace Vulkan
@@ -75,7 +74,7 @@ namespace Vulkan
 
 		if (enableValidationLayer)
 		{
-			callback = new DebugReportCallback(internal);
+			//callback = DebugReportCallback(internal);
 		}
 
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -98,11 +97,7 @@ namespace Vulkan
 
 	void Instance::Destroy()
 	{
-		if (callback != 0)
-		{
-			callback->Destroy(internal);
-			delete callback;
-		}
+		callback.Destroy(internal);
 
 		vkDestroyInstance(internal, 0);
 	}

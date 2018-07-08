@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "QueueFamilyProperties.h"
+#include "LogicalDevice.h"
 
 namespace Vulkan
 {
@@ -12,9 +13,13 @@ namespace Vulkan
 		PhysicalDevice();
 		PhysicalDevice(const VkPhysicalDevice& physicalDevice);
 
+		const LogicalDevice CreateLogicalDevice(const std::vector<const char*>& extensions, const std::vector<LogicalDeviceQueueCreateInfo>& createInfo) const;
+
 		const std::string GetName() const;
 
 		const QueueFamilyProperties* GetFirstGraphicsQueue() const;
+
+		const VkPhysicalDevice& GetInternal() const;
 
 	private:
 		VkPhysicalDevice internal;

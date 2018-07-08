@@ -23,8 +23,25 @@ int main()
 
 	Vulkan::Instance instance(properties);
 
+	Vulkan::PhysicalDevice physicalDevice = instance.GetPhysicalDevices()[0];
+
+	Vulkan::QueueFamilyProperties graphicsQueue = *physicalDevice.GetFirstGraphicsQueue();
+
+	std::vector<const char*> extensions = 
+	{
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
+	std::vector<Vulkan::LogicalDeviceQueueCreateInfo> deviceQueueCreateInfo = 
+	{
+		{graphicsQueue,  1.0f }
+	};
+
+
+	Vulkan::LogicalDevice logicalDevice = physicalDevice.CreateLogicalDevice(extensions, deviceQueueCreateInfo);
+
 	std::cout << instance.GetPhysicalDevices()[0].GetName() << std::endl;
 	
+	logicalDevice.Destroy();
 	instance.Destroy();
 	system("pause");
 	return 0;

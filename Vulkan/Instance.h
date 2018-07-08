@@ -2,12 +2,11 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include "PhysicalDevice.h"
-
+#include "DebugReportCallback.h"
 
 namespace Vulkan
 {
 	struct InstanceProperties;
-	class DebugReportCallback;
 
 	class Instance
 	{
@@ -23,6 +22,6 @@ namespace Vulkan
 		VkInstance internal;
 		std::vector<PhysicalDevice> physicalDevices;
 
-		DebugReportCallback* callback;
+		DebugReportCallback callback;
 	};
 }

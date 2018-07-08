@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Instance.cpp" />
+    <ClCompile Include="LogicalDevice.cpp" />
     <ClCompile Include="PhysicalDevice.cpp" />
     <ClCompile Include="Test.cpp" />
     <ClCompile Include="VulkanUtil.cpp" />
@@ -152,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="DebugReportCallback.h" />
     <ClInclude Include="InstanceProperties.h" />
+    <ClInclude Include="LogicalDevice.h" />
     <ClInclude Include="QueueFamilyProperties.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="Instance.h" />
