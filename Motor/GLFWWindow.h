@@ -2,6 +2,8 @@
 #include "Window.h"
 #include <BasicTypes.h>
 
+
+
 struct GLFWwindow;
 
 namespace Engine
@@ -12,13 +14,13 @@ namespace Engine
 		GLFWWindow();
 		GLFWWindow(const uint& width, const uint& height, const char* title, const WindowMode& windowMode);
 
-		void Create() override;
+		virtual void Create() override;
 		
 		bool IsActive() override;
 
-		void Update() override;
+		virtual void Update() override;
 
-		void Destroy() override;
+		virtual void Destroy() override;
 
 		void SetDimensions(const uint& width, const uint& height) override;
 
@@ -26,7 +28,9 @@ namespace Engine
 
 		void SetWindowMode(const WindowMode& windowMode) override;
 
-	private:
-		GLFWwindow * window;
+		const WindowHandle GetHandle() const override;
+
+	protected:
+		GLFWwindow* window;
 	};
 };

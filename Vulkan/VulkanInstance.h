@@ -1,8 +1,10 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <vector>
-#include "PhysicalDevice.h"
-#include "DebugReportCallback.h"
+#include "VulkanPhysicalDevice.h"
+#include "VulkanDebugReportCallback.h"
+#include "VulkanSurface.h"
+#include <BasicTypes.h>
 
 namespace Vulkan
 {
@@ -14,6 +16,8 @@ namespace Vulkan
 		Instance(const InstanceProperties& properties);
 		
 		void Destroy();
+
+ 		const Surface CreateWindowSurface(const WindowHandle& windowHandle) const;
 
 		const std::vector<PhysicalDevice>& GetPhysicalDevices() const;
 

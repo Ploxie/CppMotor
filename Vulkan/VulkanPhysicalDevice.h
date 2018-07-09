@@ -2,8 +2,8 @@
 #include <vulkan/vulkan.h>
 #include <string>
 #include <vector>
-#include "QueueFamilyProperties.h"
-#include "LogicalDevice.h"
+#include "VulkanQueueFamilyProperties.h"
+#include "VulkanLogicalDevice.h"
 
 namespace Vulkan
 {

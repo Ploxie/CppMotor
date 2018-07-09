@@ -1,4 +1,4 @@
-#include "PhysicalDevice.h"
+#include "VulkanPhysicalDevice.h"
 #include <BasicTypes.h>
 #include <iostream>
 #include "VulkanUtil.h"
@@ -49,9 +49,9 @@ namespace Vulkan
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.queueCreateInfoCount = queueCreateInfos.size();
+		deviceCreateInfo.queueCreateInfoCount = (uint32_t)queueCreateInfos.size();
 		deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
-		deviceCreateInfo.enabledExtensionCount = extensions.size();
+		deviceCreateInfo.enabledExtensionCount = (uint32_t)extensions.size();
 		deviceCreateInfo.enabledLayerCount = 0;
 
 		VkDevice device;

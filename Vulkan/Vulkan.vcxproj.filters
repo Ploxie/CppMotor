@@ -2,17 +2,23 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Test.cpp" />
-    <ClCompile Include="Instance.cpp">
-      <Filter>Instance</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicalDevice.cpp">
-      <Filter>Device</Filter>
-    </ClCompile>
     <ClCompile Include="VulkanUtil.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanLogicalDevice.cpp">
+      <Filter>Device</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanPhysicalDevice.cpp">
+      <Filter>Device</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanInstance.cpp">
       <Filter>Instance</Filter>
     </ClCompile>
-    <ClCompile Include="LogicalDevice.cpp">
-      <Filter>Device</Filter>
+    <ClCompile Include="VulkanQueue.cpp">
+      <Filter>Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanSurface.cpp">
+      <Filter>Surface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -22,34 +28,52 @@
     <Filter Include="Device">
       <UniqueIdentifier>{79f2f669-5ccf-4b8e-a8f3-e2921ccf9dee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{343d89d8-5373-43bc-8d44-282f03bab624}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{4f05c602-9d4a-4717-8022-10dad53ac616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Queue">
+      <UniqueIdentifier>{32a863e8-f64c-43e0-8e4f-f342e4c05330}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Surface">
+      <UniqueIdentifier>{ef6a2564-754e-4af0-afaa-70cccdc858d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Instance.h">
-      <Filter>Instance</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicalDevice.h">
-      <Filter>Device</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationInfo.h">
-      <Filter>Instance</Filter>
-    </ClInclude>
-    <ClInclude Include="Version.h">
-      <Filter>Instance</Filter>
-    </ClInclude>
-    <ClInclude Include="InstanceProperties.h">
-      <Filter>Instance</Filter>
-    </ClInclude>
-    <ClInclude Include="QueueFamilyProperties.h">
-      <Filter>Instance</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugReportCallback.h">
-      <Filter>Instance</Filter>
-    </ClInclude>
     <ClInclude Include="VulkanUtil.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanLogicalDevice.h">
+      <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPhysicalDevice.h">
+      <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanApplicationInfo.h">
       <Filter>Instance</Filter>
     </ClInclude>
-    <ClInclude Include="LogicalDevice.h">
-      <Filter>Device</Filter>
+    <ClInclude Include="VulkanInstance.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanInstanceProperties.h">
+      <Filter>Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanDebugReportCallback.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanQueue.h">
+      <Filter>Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanQueueFamilyProperties.h">
+      <Filter>Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanVersion.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanSurface.h">
+      <Filter>Surface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,13 +20,13 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{9C3D5EF1-7329-4704-874B-AA9CFE29B16F}</ProjectGuid>
-    <RootNamespace>Vulkan</RootNamespace>
+    <ProjectGuid>{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}</ProjectGuid>
+    <RootNamespace>VulkanEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -39,7 +39,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -73,23 +73,15 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(Platform)\</IntDir>
     <TargetName>$(ProjectName)$(Platform)</TargetName>
-    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath);..\Utilities;</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib32;..\libs\x86\;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;$(VC_IncludePath);$(WindowsSDK_IncludePath);..\libs\include\;..\Utilities;..\Vulkan\;..\Motor\</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib32;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;..\libs\x86\;..\bin\</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(Platform)\</IntDir>
     <TargetName>$(ProjectName)$(Platform)</TargetName>
-    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath);..\Utilities;</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib;..\libs\x64\;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib32;..\libs\x86\;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib;..\libs\x64\;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VulkanSDK\1.1.70.1\Include;$(VC_IncludePath);$(WindowsSDK_IncludePath);..\libs\include\;..\Utilities;..\Vulkan\;..\Motor\</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;..\libs\x64\;..\bin\</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -99,7 +91,8 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;%(AdditionalDependencies);Vulkan$(Platform).lib;vulkan-1.lib;;Motor$(Platform).lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,7 +103,8 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies);Utilities$(Platform).lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;%(AdditionalDependencies);Vulkan$(Platform).lib;Utilities$(Platform).lib;Motor$(Platform).lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,7 +119,6 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,30 +133,10 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="VulkanInstance.cpp" />
-    <ClCompile Include="VulkanLogicalDevice.cpp" />
-    <ClCompile Include="VulkanPhysicalDevice.cpp" />
-    <ClCompile Include="VulkanQueue.cpp" />
     <ClCompile Include="Test.cpp" />
-    <ClCompile Include="VulkanSurface.cpp" />
-    <ClCompile Include="VulkanUtil.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="VulkanSurface.h" />
-    <ClInclude Include="VulkanDebugReportCallback.h" />
-    <ClInclude Include="VulkanInstanceProperties.h" />
-    <ClInclude Include="VulkanLogicalDevice.h" />
-    <ClInclude Include="VulkanQueue.h" />
-    <ClInclude Include="VulkanQueueFamilyProperties.h" />
-    <ClInclude Include="VulkanVersion.h" />
-    <ClInclude Include="VulkanInstance.h" />
-    <ClInclude Include="VulkanPhysicalDevice.h" />
-    <ClInclude Include="VulkanApplicationInfo.h" />
-    <ClInclude Include="VulkanUtil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,6 +14,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vulkan", "Vulkan\Vulkan.vcxproj", "{9C3D5EF1-7329-4704-874B-AA9CFE29B16F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanEngine", "VulkanEngine\VulkanEngine.vcxproj", "{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9A91B1C6-B01D-4A9D-ADE5-26A12AE0D7A8} = {9A91B1C6-B01D-4A9D-ADE5-26A12AE0D7A8}
+		{9C3D5EF1-7329-4704-874B-AA9CFE29B16F} = {9C3D5EF1-7329-4704-874B-AA9CFE29B16F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -54,6 +60,14 @@ Global
 		{9C3D5EF1-7329-4704-874B-AA9CFE29B16F}.Release|x64.Build.0 = Release|x64
 		{9C3D5EF1-7329-4704-874B-AA9CFE29B16F}.Release|x86.ActiveCfg = Release|Win32
 		{9C3D5EF1-7329-4704-874B-AA9CFE29B16F}.Release|x86.Build.0 = Release|Win32
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Debug|x64.ActiveCfg = Debug|x64
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Debug|x64.Build.0 = Debug|x64
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Debug|x86.ActiveCfg = Debug|Win32
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Debug|x86.Build.0 = Debug|Win32
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Release|x64.ActiveCfg = Release|x64
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Release|x64.Build.0 = Release|x64
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Release|x86.ActiveCfg = Release|Win32
+		{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

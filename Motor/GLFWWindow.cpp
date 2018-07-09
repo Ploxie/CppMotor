@@ -1,5 +1,7 @@
 #include "GLFWWindow.h"
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#include <iostream>
 
 namespace Engine
 {
@@ -20,7 +22,6 @@ namespace Engine
 
 	void GLFWWindow::Create()
 	{
-		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		if (windowMode == BORDERLESS)
 		{
@@ -29,7 +30,7 @@ namespace Engine
 		else
 		{
 			glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
-		}
+		}		
 
 		GLFWmonitor* monitor = 0;
 		if (windowMode == FULL_SCREEN)
@@ -37,7 +38,11 @@ namespace Engine
 			monitor = glfwGetPrimaryMonitor();
 		}
 
-		this->window = glfwCreateWindow(width, height, title, monitor, 0);
+		window = glfwCreateWindow(width, height, title, monitor, 0);
+		if (!window)
+		{
+			std::cerr << "Failed to create window" << std::endl;
+		}
 	}
 
 	bool GLFWWindow::IsActive()
@@ -69,8 +74,13 @@ namespace Engine
 	void GLFWWindow::SetWindowMode(const WindowMode& windowMode)
 	{
 		this->windowMode = windowMode;
+		
 	}
 
+	const WindowHandle GLFWWindow::GetHandle() const
+	{
+		return glfwGetWin32Window(window);
+	}
 
 
 }

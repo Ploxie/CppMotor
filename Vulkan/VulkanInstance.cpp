@@ -1,10 +1,10 @@
-#include "Instance.h"
-
+#define VK_USE_PLATFORM_WIN32_KHR
+#include "VulkanInstance.h"
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 #include <vector>
 #include <iostream>
-#include "InstanceProperties.h"
+#include "VulkanInstanceProperties.h"
 #include "VulkanUtil.h"
 
 namespace Vulkan
@@ -100,6 +100,29 @@ namespace Vulkan
 		callback.Destroy(internal);
 
 		vkDestroyInstance(internal, 0);
+	}
+
+	const Surface Instance::CreateWindowSurface(const WindowHandle& windowHandle) const
+	{
+		VkSurfaceKHR surfaceKHR;
+
+		VkWin32SurfaceCreateInfoKHR createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		//createInfo.hwnd = windowHandle;
+		createInfo.hinstance = GetModuleHandle(nullptr);
+
+		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(internal, "vkCreateWin32SurfaceKHR");
+
+		if (!CreateWin32SurfaceKHR) {
+			std::cerr << "Failed to find function: vkCreateWin32SurfaceKHR" << std::endl;
+		}
+
+		VkResult result = CreateWin32SurfaceKHR(internal, &createInfo, nullptr, &surfaceKHR);
+		if (result != VK_SUCCESS) {
+			std::cerr << "Failed to create window surface: " << translateVulkanResult(result) << std::endl;
+		}
+
+		return Surface(surfaceKHR);
 	}
 
 	const std::vector<PhysicalDevice>& Instance::GetPhysicalDevices() const

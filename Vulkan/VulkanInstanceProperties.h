@@ -1,5 +1,5 @@
 #pragma once
-#include "ApplicationInfo.h"
+#include "VulkanApplicationInfo.h"
 #include <vector>
 
 namespace Vulkan

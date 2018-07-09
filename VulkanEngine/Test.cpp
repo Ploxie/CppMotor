@@ -1,14 +1,22 @@
 #pragma once
 #include <iostream>
-#include "VulkanInstance.h"
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
+
+#include <VulkanInstance.h>
+#include <GLFWWindow.h>
 #include "VulkanInstanceProperties.h"
 
 
+using namespace Engine;
 
 int main()
 {
+
 	glfwInit();
+
+	Window* window = new GLFWWindow(50, 50, "ASD", WINDOWED);
+	window->Create();
 
 	Vulkan::ApplicationInfo appInfo = {};
 	appInfo.applicationName = "Application";
@@ -21,7 +29,7 @@ int main()
 	properties.applicationInfo = appInfo;
 	properties.extensions = {};
 	properties.layers = {};
-	
+
 	Vulkan::Instance instance(properties);
 
 	Vulkan::PhysicalDevice physicalDevice = instance.GetPhysicalDevices()[0];
@@ -32,8 +40,10 @@ int main()
 
 	Vulkan::Queue queue = logicalDevice.GetQueue(graphicsQueue.GetIndex(), 0);
 
+	Vulkan::Surface surface = instance.CreateWindowSurface(window->GetHandle());
 
 	std::cout << instance.GetPhysicalDevices()[0].GetName() << std::endl;
+	
 
 
 

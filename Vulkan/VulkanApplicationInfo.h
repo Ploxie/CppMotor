@@ -1,6 +1,6 @@
 #pragma once
 #include <BasicTypes.h>
-#include "Version.h"
+#include "VulkanVersion.h"
 
 namespace Vulkan
 {
