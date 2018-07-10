@@ -31,24 +31,51 @@ int main()
 	properties.layers = {};
 
 	Vulkan::Instance instance(properties);
+	Vulkan::Surface surface = instance.CreateSurface(window->GetHandle());
 
-	Vulkan::PhysicalDevice physicalDevice = instance.GetPhysicalDevices()[0];
+	std::vector<Vulkan::PhysicalDevice> physicalDevices = instance.GetPhysicalDevices();
 
-	Vulkan::QueueFamilyProperties graphicsQueue = *physicalDevice.GetFirstGraphicsQueue();
+	for (uint i = 0; i < physicalDevices.size(); i++)
+	{
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << physicalDevices[i].GetProperties().deviceName << std::endl;
+		auto properties = physicalDevices[i].GetQueueFamilyProperties();
 
-	Vulkan::LogicalDevice logicalDevice = physicalDevice.CreateLogicalDevice({ VK_KHR_SWAPCHAIN_EXTENSION_NAME }, { { graphicsQueue,  1.0f } });
+		std::cout << "Properties: " << std::endl;
+		for (uint i = 0; i < properties.size(); i++)
+		{
+			std::cout << "Queue count: " << properties[i].queueCount << std::endl;
+			std::cout << "Queue flags: " << properties[i].queueFlags << std::endl << std::endl;
+		}
 
-	Vulkan::Queue queue = logicalDevice.GetQueue(graphicsQueue.GetIndex(), 0);
+		auto extensions = physicalDevices[i].GetSupportedExtensions();
+		std::cout << "Extensions: " << std::endl;
+		for (uint i = 0; i < extensions.size(); i++)
+		{
+			std::cout << extensions[i].extensionName << std::endl;
+		}
 
-	Vulkan::Surface surface = instance.CreateWindowSurface(window->GetHandle());
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << std::endl << std::endl;
+	}
 
-	std::cout << instance.GetPhysicalDevices()[0].GetName() << std::endl;
+
+
+	//Vulkan::QueueFamilyProperties graphicsQueue = *physicalDevice.GetFirstGraphicsQueue();
+
+	//Vulkan::LogicalDevice logicalDevice = physicalDevice.CreateLogicalDevice({ VK_KHR_SWAPCHAIN_EXTENSION_NAME }, { { graphicsQueue,  1.0f } });
+
+	//Vulkan::Queue queue = logicalDevice.GetQueue(graphicsQueue.GetIndex(), 0);
+
+	//Vulkan::Surface surface = instance.CreateWindowSurface(window->GetHandle());
 	
 
 
+	
 
-	logicalDevice.Destroy();
-	instance.Destroy();
+
+	//logicalDevice.Destroy();
+	//instance.Destroy();
 	system("pause");
 	return 0;
 }

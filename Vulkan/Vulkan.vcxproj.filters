@@ -5,20 +5,17 @@
     <ClCompile Include="VulkanUtil.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanLogicalDevice.cpp">
-      <Filter>Device</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanPhysicalDevice.cpp">
-      <Filter>Device</Filter>
-    </ClCompile>
     <ClCompile Include="VulkanInstance.cpp">
       <Filter>Instance</Filter>
     </ClCompile>
     <ClCompile Include="VulkanQueue.cpp">
       <Filter>Queue</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanSurface.cpp">
-      <Filter>Surface</Filter>
+    <ClCompile Include="VulkanPhysicalDevice.cpp">
+      <Filter>Device\Physical</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanLogicalDevice.cpp">
+      <Filter>Device\Logical</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -37,19 +34,22 @@
     <Filter Include="Queue">
       <UniqueIdentifier>{32a863e8-f64c-43e0-8e4f-f342e4c05330}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Surface">
-      <UniqueIdentifier>{ef6a2564-754e-4af0-afaa-70cccdc858d5}</UniqueIdentifier>
+    <Filter Include="Swapchain">
+      <UniqueIdentifier>{f97fbc2b-97c6-4940-8882-fe5871c91e84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Swapchain\Surface">
+      <UniqueIdentifier>{64006725-a9dd-4fad-ba99-63311f9637dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Device\Physical">
+      <UniqueIdentifier>{297dc849-f8ec-4d06-bb8f-ee38cca16a6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Device\Logical">
+      <UniqueIdentifier>{a532b4ee-ed76-401a-98af-065f30aef68b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanUtil.h">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanLogicalDevice.h">
-      <Filter>Device</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanPhysicalDevice.h">
-      <Filter>Device</Filter>
     </ClInclude>
     <ClInclude Include="VulkanApplicationInfo.h">
       <Filter>Instance</Filter>
@@ -72,8 +72,39 @@
     <ClInclude Include="VulkanVersion.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanSwapchain.h">
+      <Filter>Swapchain</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="VulkanSurface.h">
-      <Filter>Surface</Filter>
+      <Filter>Swapchain\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPhysicalDeviceProperties.h">
+      <Filter>Device\Physical</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPhysicalDevice.h">
+      <Filter>Device\Physical</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPhysicalDeviceFeatures.h">
+      <Filter>Device\Physical</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPhysicalDeviceMemoryProperties.h">
+      <Filter>Device\Physical</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanExtensionProperties.h">
+      <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanQueueFlags.h">
+      <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanQueueFamilyIndices.h">
+      <Filter>Device</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanLogicalDevice.h">
+      <Filter>Device\Logical</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanSurfaceProperties.h">
+      <Filter>Swapchain\Surface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

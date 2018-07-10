@@ -3,5 +3,5 @@
 
 namespace Vulkan
 {
-	typedef VkSurfaceKHR Surface;
+	typedef VkSwapchainKHR Swapchain;
 }

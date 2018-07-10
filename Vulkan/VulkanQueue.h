@@ -1,5 +1,5 @@
 #pragma once
-#include <vulkan/vulkan.h>
+#include "stdafx.h"
 
 namespace Vulkan
 {

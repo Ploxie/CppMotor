@@ -74,14 +74,14 @@
     <IntDir>$(Platform)\</IntDir>
     <TargetName>$(ProjectName)$(Platform)</TargetName>
     <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath);..\Utilities;</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib32;..\libs\x86\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib32;..\libs\x86\;$(LibraryPath);..\bin\</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(Platform)\</IntDir>
     <TargetName>$(ProjectName)$(Platform)</TargetName>
     <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath);..\Utilities;</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib;..\libs\x64\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\VulkanSDK\1.1.70.1\Lib;..\libs\x64\;$(LibraryPath);..\bin\</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\VulkanSDK\1.1.70.1\Include;..\libs\include;$(IncludePath)</IncludePath>
@@ -97,9 +97,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies);Utilities$(Platform).lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -108,6 +111,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies);Utilities$(Platform).lib</AdditionalDependencies>
@@ -149,11 +155,19 @@
     <ClCompile Include="VulkanPhysicalDevice.cpp" />
     <ClCompile Include="VulkanQueue.cpp" />
     <ClCompile Include="Test.cpp" />
-    <ClCompile Include="VulkanSurface.cpp" />
     <ClCompile Include="VulkanUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="VulkanQueueFamilyIndices.h" />
+    <ClInclude Include="VulkanQueueFlags.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="VulkanExtensionProperties.h" />
+    <ClInclude Include="VulkanPhysicalDeviceFeatures.h" />
+    <ClInclude Include="VulkanPhysicalDeviceMemoryProperties.h" />
+    <ClInclude Include="VulkanPhysicalDeviceProperties.h" />
     <ClInclude Include="VulkanSurface.h" />
+    <ClInclude Include="VulkanSurfaceProperties.h" />
+    <ClInclude Include="VulkanSwapchain.h" />
     <ClInclude Include="VulkanDebugReportCallback.h" />
     <ClInclude Include="VulkanInstanceProperties.h" />
     <ClInclude Include="VulkanLogicalDevice.h" />

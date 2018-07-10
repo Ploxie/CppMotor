@@ -1,8 +1,6 @@
-#define VK_USE_PLATFORM_WIN32_KHR
+#include "stdafx.h"
 #include "VulkanInstance.h"
 #include <GLFW/glfw3.h>
-#include <stdexcept>
-#include <vector>
 #include <iostream>
 #include "VulkanInstanceProperties.h"
 #include "VulkanUtil.h"
@@ -49,8 +47,7 @@ namespace Vulkan
 #else
 		const bool enableValidationLayer = true; // FIX
 #endif		
-
-
+		
 		if (enableValidationLayer)
 		{
 			extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
@@ -71,44 +68,18 @@ namespace Vulkan
 		{
 			std::cerr << "Failed to create Vulkan Instance: " << translateVulkanResult(result) << std::endl;
 		}
-
-		if (enableValidationLayer)
-		{
-			//callback = DebugReportCallback(internal);
-		}
-
-		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-
-		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(internal, &deviceCount, nullptr);
-
-		if (deviceCount == 0) {
-			throw std::runtime_error("failed to find GPUs with Vulkan support!");
-		}
-
-		std::vector<VkPhysicalDevice> devices(deviceCount);
-		physicalDevices = std::vector<PhysicalDevice>(deviceCount);
-		vkEnumeratePhysicalDevices(internal, &deviceCount, devices.data());
-		for (unsigned int i = 0; i < deviceCount; i++)
-		{
-			physicalDevices[i] = PhysicalDevice(devices[i]);
-		}
 	}
 
 	void Instance::Destroy()
 	{
-		callback.Destroy(internal);
-
 		vkDestroyInstance(internal, 0);
 	}
 
-	const Surface Instance::CreateWindowSurface(const WindowHandle& windowHandle) const
+	const Surface Instance::CreateSurface(const WindowHandle& window) const
 	{
-		VkSurfaceKHR surfaceKHR;
-
 		VkWin32SurfaceCreateInfoKHR createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		//createInfo.hwnd = windowHandle;
+		createInfo.hwnd = window;
 		createInfo.hinstance = GetModuleHandle(nullptr);
 
 		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(internal, "vkCreateWin32SurfaceKHR");
@@ -117,16 +88,33 @@ namespace Vulkan
 			std::cerr << "Failed to find function: vkCreateWin32SurfaceKHR" << std::endl;
 		}
 
-		VkResult result = CreateWin32SurfaceKHR(internal, &createInfo, nullptr, &surfaceKHR);
+		Surface surface;
+
+		VkResult result = CreateWin32SurfaceKHR(internal, &createInfo, 0, &surface);
 		if (result != VK_SUCCESS) {
 			std::cerr << "Failed to create window surface: " << translateVulkanResult(result) << std::endl;
 		}
 
-		return Surface(surfaceKHR);
+		return surface;
 	}
-
-	const std::vector<PhysicalDevice>& Instance::GetPhysicalDevices() const
+	
+	const std::vector<PhysicalDevice> Instance::GetPhysicalDevices() const
 	{
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(internal, &deviceCount, nullptr);
+
+		if (deviceCount == 0) {			
+			std::cerr << "Failed to find Devices with Vulkan support!" << std::endl;
+		}
+
+		std::vector<VkPhysicalDevice> devices(deviceCount);
+		std::vector<PhysicalDevice> physicalDevices(deviceCount);
+		vkEnumeratePhysicalDevices(internal, &deviceCount, devices.data());
+		for (unsigned int i = 0; i < deviceCount; i++)
+		{
+			physicalDevices[i] = PhysicalDevice(devices[i]);
+		}
+
 		return physicalDevices;
 	}
 	

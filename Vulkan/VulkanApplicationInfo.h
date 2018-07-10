@@ -11,6 +11,5 @@ namespace Vulkan
 		Version applicationVersion;
 		Version engineVersion;
 		Version apiVersion;
-
 	};
 }

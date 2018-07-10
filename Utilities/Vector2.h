@@ -3,8 +3,6 @@
 #include <ostream>
 #include "Math.h"
 
-
-
 namespace Math
 {
 	template<typename T>
@@ -205,10 +203,12 @@ namespace Math
 		return a;
 	}
 
-	typedef Vector2<float> Vector2f;
-	typedef Vector2<int> Vector2i;
-	typedef Vector2<unsigned int> Vector2ui;
+	
 }
+
+typedef Math::Vector2<float> Vector2f;
+typedef Math::Vector2<int> Vector2i;
+typedef Math::Vector2<unsigned int> Vector2ui;
 
 
 

@@ -1,58 +1,96 @@
 #include "VulkanPhysicalDevice.h"
-#include <BasicTypes.h>
+#include "stdafx.h"
 #include <iostream>
 #include "VulkanUtil.h"
+#include "VulkanQueueFamilyIndices.h"
 
 namespace Vulkan
 {
 
-	PhysicalDevice::PhysicalDevice()
+	PhysicalDevice::PhysicalDevice(const VkPhysicalDevice& physicalDevice) : internal(physicalDevice)
 	{
-	}
-
-	PhysicalDevice::PhysicalDevice(const VkPhysicalDevice & physicalDevice)
-	{
-		this->internal = physicalDevice;
 
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);		
 		vkGetPhysicalDeviceFeatures(physicalDevice, &features);
+		
+		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
 
 		uint32_t queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
 
-		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
-
-		queueFamilyPropertiesList = std::vector<QueueFamilyProperties>(queueFamilyCount);
-
-		for (uint32_t i = 0; i < queueFamilyCount; i++)
+		queueFamilyProperties.resize(queueFamilyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
+				
+		uint32_t extensionCount = 0;
+		vkEnumerateDeviceExtensionProperties(physicalDevice, 0, &extensionCount, 0);
+		if (extensionCount > 0)
 		{
-			queueFamilyPropertiesList[i] = QueueFamilyProperties(i, queueFamilies[i]);
+			supportedExtensions.resize(extensionCount);
+			vkEnumerateDeviceExtensionProperties(physicalDevice, 0, &extensionCount, supportedExtensions.data());
 		}
-
 	}
 
-	const LogicalDevice PhysicalDevice::CreateLogicalDevice(const std::vector<const char*>& extensions, const std::vector<LogicalDeviceQueueCreateInfo>& createInfo) const
+	const LogicalDevice PhysicalDevice::CreateLogicalDevice(const PhysicalDeviceFeatures& enabledFeatures, const std::vector<const char*>& extensions, const QueueFlags& queueFlags) const
 	{
-		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos(createInfo.size());
-		for (uint i = 0; i < createInfo.size(); i++)
-		{
-			VkDeviceQueueCreateInfo queueCreateInfo = {};
-			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueCreateInfo.queueFamilyIndex = createInfo[i].properties.GetIndex();
-			queueCreateInfo.queueCount = 1;
-			queueCreateInfo.pQueuePriorities = &createInfo[i].priorities;
-
-			queueCreateInfos[i] = queueCreateInfo;
-		}
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos = {};
+		const float queuePriority = 0.0f;
 		
+		QueueFamilyIndices queueFamilyIndices = {};
+
+		if (queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		{
+			queueFamilyIndices.graphics = GetQueueFamilyIndex(VK_QUEUE_GRAPHICS_BIT);
+
+			VkDeviceQueueCreateInfo queueInfo = {};
+			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueInfo.queueFamilyIndex = queueFamilyIndices.graphics;
+			queueInfo.queueCount = 1;
+			queueInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(queueInfo);
+		}
+
+		if (queueFlags & VK_QUEUE_COMPUTE_BIT)
+		{
+			queueFamilyIndices.compute = GetQueueFamilyIndex(VK_QUEUE_COMPUTE_BIT);
+
+			VkDeviceQueueCreateInfo queueInfo = {};
+			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueInfo.queueFamilyIndex = queueFamilyIndices.compute;
+			queueInfo.queueCount = 1;
+			queueInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(queueInfo);
+		}
+		else
+		{
+			queueFamilyIndices.compute = queueFamilyIndices.graphics;
+		}
+
+		if (queueFlags & VK_QUEUE_TRANSFER_BIT)
+		{
+			queueFamilyIndices.transfer = GetQueueFamilyIndex(VK_QUEUE_TRANSFER_BIT);
+
+			VkDeviceQueueCreateInfo queueInfo = {};
+			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueInfo.queueFamilyIndex = queueFamilyIndices.transfer;
+			queueInfo.queueCount = 1;
+			queueInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(queueInfo);
+		}
+		else
+		{
+			queueFamilyIndices.transfer = queueFamilyIndices.graphics;
+		}
+				
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		deviceCreateInfo.queueCreateInfoCount = static_cast<uint>(queueCreateInfos.size());		
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.queueCreateInfoCount = (uint32_t)queueCreateInfos.size();
+		deviceCreateInfo.enabledExtensionCount = static_cast<uint>(extensions.size());
 		deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
-		deviceCreateInfo.enabledExtensionCount = (uint32_t)extensions.size();
-		deviceCreateInfo.enabledLayerCount = 0;
+		deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
 
 		VkDevice device;
 
@@ -61,31 +99,95 @@ namespace Vulkan
 			std::cerr << "Failed to create logical device: " << translateVulkanResult(result) << std::endl;
 		}
 
-		return LogicalDevice(device);
+		return LogicalDevice(device, queueFamilyIndices);
 	}
 
-	const std::string PhysicalDevice::GetName() const
+	const SurfaceProperties PhysicalDevice::GetSurfaceProperties(const Surface& surface) const
 	{
-		return std::string(properties.deviceName);
-	}
-
-	const QueueFamilyProperties* PhysicalDevice::GetFirstGraphicsQueue() const
-	{
-		for(uint i = 0 ; i < queueFamilyPropertiesList.size();i++)
+		SurfaceProperties properties = {};
+		VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(internal, surface, &properties.capabilities);
+		if (result != VK_SUCCESS)
 		{
-			const QueueFamilyProperties &p = queueFamilyPropertiesList[i];
-			if (p.HasGraphicsCapabilities())
+			std::cerr << "Failed to get Surface capabilities: " << translateVulkanResult(result) << std::endl;
+		}
+
+		uint presentModeCount = 0;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(internal, surface, &presentModeCount, 0);
+
+		properties.presentModes.resize(presentModeCount);
+		result = vkGetPhysicalDeviceSurfacePresentModesKHR(internal, surface, &presentModeCount, properties.presentModes.data());
+		if (result != VK_SUCCESS)
+		{
+			std::cerr << "Failed to get Surface present Modes: " << translateVulkanResult(result) << std::endl;
+		}
+
+		uint formatCount = 0;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(internal, surface, &formatCount, 0);
+
+		properties.formats.resize(formatCount);
+		result = vkGetPhysicalDeviceSurfaceFormatsKHR(internal, surface, &formatCount, properties.formats.data());
+		if (result != VK_SUCCESS)
+		{
+			std::cerr << "Failed to get Surface Formats: " << translateVulkanResult(result) << std::endl;
+		}
+
+		return properties;
+	}
+
+	const uint PhysicalDevice::GetQueueFamilyIndex(const VkQueueFlags& queueFlags) const
+	{
+		if (queueFlags & VK_QUEUE_COMPUTE_BIT && !(queueFlags & VK_QUEUE_GRAPHICS_BIT))
+		{
+			for (uint i = 0; i < queueFamilyProperties.size(); i++)
 			{
-				return &p;
+				const VkQueueFlags& flags = queueFamilyProperties[i].queueFlags;
+				bool hasGraphicsBit = (flags & VK_QUEUE_GRAPHICS_BIT) != 0;
+
+				if ((flags & queueFlags) && !hasGraphicsBit)
+				{
+					return i;
+				}
 			}
 		}
 
-		return 0;
+		if (queueFlags & VK_QUEUE_TRANSFER_BIT && !(queueFlags & VK_QUEUE_GRAPHICS_BIT) && !(queueFlags & VK_QUEUE_COMPUTE_BIT))
+		{
+			for (uint i = 0; i < queueFamilyProperties.size(); i++)
+			{
+				const VkQueueFlags& flags = queueFamilyProperties[i].queueFlags;
+				bool hasGraphicsBit = (flags & VK_QUEUE_GRAPHICS_BIT) != 0;
+				bool hasComputeBit = (flags & VK_QUEUE_COMPUTE_BIT) != 0;
+
+				if ((flags & queueFlags) && !hasGraphicsBit && !hasComputeBit)
+				{
+					return i;
+				}
+			}
+		}
+
+		for (uint i = 0; i < queueFamilyProperties.size(); i++) {
+			const VkQueueFlags& flags = queueFamilyProperties[i].queueFlags;
+			if (flags & queueFlags) {
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
-	const VkPhysicalDevice& PhysicalDevice::GetInternal() const
+	const bool PhysicalDevice::IsExtensionSupported(const char* extension, const uint& minVersion) const
 	{
-		return internal;
+		for (uint i = 0; i < supportedExtensions.size(); i++)
+		{
+			const ExtensionProperties& ext = supportedExtensions[i];
+			if (std::strcmp(ext.extensionName, extension) && ext.specVersion >= minVersion)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
+	
+	
 
 }

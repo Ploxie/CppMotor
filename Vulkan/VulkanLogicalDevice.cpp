@@ -1,30 +1,21 @@
 #pragma once
+#include "stdafx.h"
 #include "VulkanLogicalDevice.h"
 #include "VulkanUtil.h"
 #include <iostream>
+#include "VulkanPhysicalDevice.h"
 
 namespace Vulkan
 {
-
-	LogicalDevice::LogicalDevice(const VkDevice& internal) : internal(internal)
+	
+	LogicalDevice::LogicalDevice(const VkDevice& internal, const QueueFamilyIndices& queueFamilyIndices) : internal(internal), queueFamilyIndices(queueFamilyIndices)
 	{
 
 	}
 
-	const Queue& LogicalDevice::GetQueue(const uint& queueFamilyIndex, const uint& queueIndex)
-	{
-		std::string cacheKey = std::to_string(queueFamilyIndex) + " : " + std::to_string(queueIndex);
+	//const Swapchain LogicalDevice::CreateSwapchain(const SurfaceFormat& format, const PresentMode& presentMode, const VkExtent2D& extent, const Swapchain* oldSwapchain = nullptr) const
 
-		if (queues.find(cacheKey) == queues.end())
-		{
-			VkQueue graphicsQueue;
-			vkGetDeviceQueue(internal, queueFamilyIndex, queueIndex, &graphicsQueue);
-			queues.insert(std::pair<std::string, Queue>(cacheKey, Queue(graphicsQueue)));
-		}
-
-		return queues.at(cacheKey);
-	}
-
+		
 	void LogicalDevice::Destroy()
 	{
 		vkDestroyDevice(internal, 0);

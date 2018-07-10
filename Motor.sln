@@ -13,6 +13,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\Application.vcxproj", "{B2269F7C-767E-46F7-9241-677001CCEF9C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vulkan", "Vulkan\Vulkan.vcxproj", "{9C3D5EF1-7329-4704-874B-AA9CFE29B16F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{25ED0E39-F86D-47AE-8AD0-839AEF761CAA} = {25ED0E39-F86D-47AE-8AD0-839AEF761CAA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanEngine", "VulkanEngine\VulkanEngine.vcxproj", "{B5C7DA4F-475B-45A0-9837-77BC8A1A5575}"
 	ProjectSection(ProjectDependencies) = postProject
