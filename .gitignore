@@ -45,6 +45,8 @@
 *.opendb
 *.suo
 *.ilk
+*.iobj
+*.ipdb
 
 !/libs/x86/*
 !/libs/x64/*
