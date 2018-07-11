@@ -46,6 +46,9 @@
     <Filter Include="Device\Logical">
       <UniqueIdentifier>{a532b4ee-ed76-401a-98af-065f30aef68b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Image">
+      <UniqueIdentifier>{6e292d2d-0c48-42be-9909-b5a75718e724}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanUtil.h">
@@ -94,12 +97,6 @@
     <ClInclude Include="VulkanExtensionProperties.h">
       <Filter>Device</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanQueueFlags.h">
-      <Filter>Device</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanQueueFamilyIndices.h">
-      <Filter>Device</Filter>
-    </ClInclude>
     <ClInclude Include="VulkanLogicalDevice.h">
       <Filter>Device\Logical</Filter>
     </ClInclude>
@@ -108,6 +105,18 @@
     </ClInclude>
     <ClInclude Include="VulkanSwapchainProperties.h">
       <Filter>Swapchain</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanImageView.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanImage.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanQueueFamilyIndices.h">
+      <Filter>Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanQueueFlags.h">
+      <Filter>Queue</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

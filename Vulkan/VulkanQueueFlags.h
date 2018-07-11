@@ -3,6 +3,5 @@
 
 namespace Vulkan
 {
-	typedef VkQueueFlagBits QueueFlagBits;
 	typedef VkQueueFlags QueueFlags;
 }

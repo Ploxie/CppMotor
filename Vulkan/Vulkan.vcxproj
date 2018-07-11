@@ -158,6 +158,8 @@
     <ClCompile Include="VulkanUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="VulkanImage.h" />
+    <ClInclude Include="VulkanImageView.h" />
     <ClInclude Include="VulkanQueueFamilyIndices.h" />
     <ClInclude Include="VulkanQueueFlags.h" />
     <ClInclude Include="stdafx.h" />

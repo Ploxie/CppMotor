@@ -77,9 +77,73 @@ namespace Vulkan
 		std::vector<VkImage> swapchainImages(swapchainProperties.imageCount);
 		vkGetSwapchainImagesKHR(internal, swapchain, &swapchainProperties.imageCount, swapchainImages.data());
 
-		return Swapchain(swapchain, swapchainProperties, swapchainImages);
+		std::vector<Image> images;
+		for (uint i = 0; i < swapchainProperties.imageCount; i++)
+		{
+			images.push_back(Image(swapchainImages[i], VK_IMAGE_TYPE_2D, VK_IMAGE_LAYOUT_UNDEFINED, swapchainProperties.extent.width, swapchainProperties.extent.height, 1));
+		}
+
+		return Swapchain(swapchain, swapchainProperties, images);
 	}
 
+	const Image LogicalDevice::CreateImage(const ImageType& imageType, const ImageFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const
+	{
+		ImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		VkImageCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		createInfo.imageType = imageType;
+		createInfo.extent.width = width;
+		createInfo.extent.height = height;
+		createInfo.extent.depth = depth;
+		createInfo.mipLevels = mipLevels;
+		createInfo.arrayLayers = arrayLevels;
+		createInfo.format = format;
+		createInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		createInfo.initialLayout = layout;
+		createInfo.usage = usageFlags;
+		createInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		VkImage image;
+		VkResult result = vkCreateImage(internal, &createInfo, nullptr, &image);
+		if (result != VK_SUCCESS) {
+			std::cerr << "Failed to create image: " << translateVulkanResult(result) << std::endl;
+		}
+
+		return Image(image, imageType, layout, width, height, depth);
+	}
+
+	const ImageView LogicalDevice::CreateImageView(const Image& image, const ImageFormat& format, const ImageAspectFlags& aspectFlags) const
+	{
+
+		VkImageViewCreateInfo createInfo = {};
+		
+		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		createInfo.image = image.GetHandle();
+		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		createInfo.format = format;
+
+		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+		createInfo.subresourceRange.aspectMask = aspectFlags;
+		createInfo.subresourceRange.baseMipLevel = 0;
+		createInfo.subresourceRange.levelCount = 1;
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount = 1;
+
+		ImageView imageView;
+
+		VkResult result = vkCreateImageView(internal, &createInfo, nullptr, &imageView);
+		if (result != VK_SUCCESS) {
+			std::cerr << "Failed to create Image view: " << translateVulkanResult(result) << std::endl;
+		}
+
+		return imageView;
+	}
 		
 	void LogicalDevice::DestroySwapchain(const Swapchain& swapchain)
 	{

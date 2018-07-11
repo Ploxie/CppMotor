@@ -116,6 +116,20 @@ int main()
 	
 	Vulkan::Swapchain swapchain = logicalDevice.CreateSwapchain(swapchainProperties);
 
+	auto images = swapchain.GetImages();
+
+	std::cout << "Swapchain Images: " << std::endl;
+	for (uint i = 0; i < images.size(); i++)
+	{
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << "Type: " << images[i].GetType() << std::endl;
+		std::cout << "Layout: " << images[i].GetLayout() << std::endl;
+		std::cout << "Width: " << images[i].GetWidth() << std::endl;
+		std::cout << "Height: " << images[i].GetHeight() << std::endl;
+		std::cout << "Depth: " << images[i].GetDepth() << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << std::endl;
+	}
 	//Vulkan::QueueFamilyProperties graphicsQueue = *physicalDevice.GetFirstGraphicsQueue();
 
 	//Vulkan::LogicalDevice logicalDevice = physicalDevice.CreateLogicalDevice({ VK_KHR_SWAPCHAIN_EXTENSION_NAME }, { { graphicsQueue,  1.0f } });
