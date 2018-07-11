@@ -99,7 +99,7 @@ namespace Vulkan
 			std::cerr << "Failed to create logical device: " << translateVulkanResult(result) << std::endl;
 		}
 
-		return LogicalDevice(device, queueFamilyIndices);
+		return LogicalDevice(device,*this, queueFamilyIndices);
 	}
 
 	const SurfaceProperties PhysicalDevice::GetSurfaceProperties(const Surface& surface) const
@@ -186,6 +186,23 @@ namespace Vulkan
 			}
 		}
 		return false;
+	}
+
+	const int PhysicalDevice::GetPresentQueueFamilyIndex(const Surface& surface) const
+	{
+		int index = -1;
+
+		for (uint i = 0; i < queueFamilyProperties.size(); i++)
+		{
+			VkBool32 hasSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(internal, i, surface, &hasSupport);
+			if (hasSupport)
+			{
+				return i;
+			}
+		}
+
+		return index;
 	}
 	
 	

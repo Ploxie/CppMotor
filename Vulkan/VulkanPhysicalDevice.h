@@ -26,6 +26,7 @@ namespace Vulkan
 				
 		const uint GetQueueFamilyIndex(const VkQueueFlags& flagBit) const;
 		const bool IsExtensionSupported(const char* extension, const uint& minVersion) const;
+		const int GetPresentQueueFamilyIndex(const Surface& surface) const;
 
 		inline const PhysicalDeviceProperties& GetProperties() const;
 		inline const PhysicalDeviceFeatures& GetFeatures() const;

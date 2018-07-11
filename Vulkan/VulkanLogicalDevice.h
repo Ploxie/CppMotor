@@ -7,43 +7,45 @@
 
 namespace Vulkan
 {
-	
+	class PhysicalDevice;
+
 	class LogicalDevice
 	{
 	public:
-		LogicalDevice(const VkDevice& internal, const QueueFamilyIndices& queueFamilyIndices);
+		LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueueFamilyIndices& queueFamilyIndices);
+		
+		const Swapchain CreateSwapchain(const SwapchainProperties& properties, const Swapchain* oldSwapchain = nullptr) const;
 
+		inline const Queue& GetGraphicsQueue() const;
+		inline const Queue& GetComputeQueue() const;
+		inline const Queue& GetTransferQueue() const;
 
-		//const Swapchain CreateSwapchain(const SurfaceFormat& format, const PresentMode& presentMode, const VkExtent2D& extent, const Swapchain* oldSwapchain = nullptr) const;
-
-	/*	inline const Queue* GetGraphicsQueue() const;
-		inline const Queue* GetComputeQueue() const;
-		inline const Queue* GetTransferQueue() const;*/
-
+		void DestroySwapchain(const Swapchain& swapchain);
 		void Destroy();
 
 	protected:
 		const VkDevice internal;
+		const PhysicalDevice& physicalDevice;
 
-		/*Queue graphicsQueue;
+		Queue graphicsQueue;
 		Queue computeQueue;
-		Queue transferQueue;*/
+		Queue transferQueue;
 
 		QueueFamilyIndices queueFamilyIndices;		
 	};
 
-	/*inline const Queue* LogicalDevice::GetGraphicsQueue() const
-	{
-		return &graphicsQueue;
+	inline const Queue& LogicalDevice::GetGraphicsQueue() const
+	{			
+		return graphicsQueue;
 	}
 
-	inline const Queue* LogicalDevice::GetComputeQueue() const
+	inline const Queue& LogicalDevice::GetComputeQueue() const
 	{
-		return &computeQueue;
+		return computeQueue;
 	}
 
-	inline const Queue* LogicalDevice::GetTransferQueue() const
+	inline const Queue& LogicalDevice::GetTransferQueue() const
 	{
-		return &transferQueue;
-	}*/
+		return transferQueue;
+	}
 }

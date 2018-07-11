@@ -10,12 +10,43 @@
 
 using namespace Engine;
 
+Vulkan::SurfaceFormat GetSurfaceFormat(const std::vector<Vulkan::SurfaceFormat>& availableFormats)
+{
+	if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED) {
+		return { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+	}
+
+	for (const auto& availableFormat : availableFormats) {
+		if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+			return availableFormat;
+		}
+	}
+
+	return availableFormats[0];
+}
+
+Vulkan::PresentMode GetPresentMode(const std::vector<Vulkan::PresentMode>& availablePresentModes)
+{
+	Vulkan::PresentMode bestMode = VK_PRESENT_MODE_FIFO_KHR;
+
+	for (const auto& availablePresentMode : availablePresentModes) {
+		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+			return availablePresentMode;
+		}
+		else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+			bestMode = availablePresentMode;
+		}
+	}
+
+	return bestMode;
+}
+
 int main()
 {
 
 	glfwInit();
 
-	Window* window = new GLFWWindow(50, 50, "ASD", WINDOWED);
+	Window* window = new GLFWWindow(800, 600, "ASD", WINDOWED);
 	window->Create();
 
 	Vulkan::ApplicationInfo appInfo = {};
@@ -59,7 +90,31 @@ int main()
 		std::cout << std::endl << std::endl;
 	}
 
+	Vulkan::SurfaceProperties surfaceProperties = physicalDevices[0].GetSurfaceProperties(surface);
+	
+	std::vector<const char*> extensions = 
+	{
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	
+	};
+	Vulkan::LogicalDevice logicalDevice = physicalDevices[0].CreateLogicalDevice(physicalDevices[0].GetFeatures(), extensions, VK_QUEUE_GRAPHICS_BIT);
 
+	uint imageCount = surfaceProperties.capabilities.minImageCount + 1;
+	uint maxImageCount = surfaceProperties.capabilities.maxImageCount;
+	if (maxImageCount > 0 && imageCount > maxImageCount)
+	{
+		imageCount = maxImageCount;
+	}
+
+	Vulkan::SwapchainProperties swapchainProperties = {};
+	swapchainProperties.imageCount = imageCount;
+	swapchainProperties.surface = surface;
+	swapchainProperties.surfaceFormat = GetSurfaceFormat(surfaceProperties.formats);
+	swapchainProperties.transformFlags = surfaceProperties.capabilities.currentTransform;
+	swapchainProperties.presentMode = GetPresentMode(surfaceProperties.presentModes);
+	swapchainProperties.extent = VkExtent2D{800,600};
+	
+	Vulkan::Swapchain swapchain = logicalDevice.CreateSwapchain(swapchainProperties);
 
 	//Vulkan::QueueFamilyProperties graphicsQueue = *physicalDevice.GetFirstGraphicsQueue();
 
@@ -73,9 +128,9 @@ int main()
 
 	
 
-
-	//logicalDevice.Destroy();
-	//instance.Destroy();
+	logicalDevice.DestroySwapchain(swapchain);
+	logicalDevice.Destroy();
+	instance.Destroy();
 	system("pause");
 	return 0;
 }

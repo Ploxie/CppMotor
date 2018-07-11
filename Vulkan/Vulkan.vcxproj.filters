@@ -106,5 +106,8 @@
     <ClInclude Include="VulkanSurfaceProperties.h">
       <Filter>Swapchain\Surface</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanSwapchainProperties.h">
+      <Filter>Swapchain</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
