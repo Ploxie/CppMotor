@@ -122,6 +122,7 @@ int main()
 	for (uint i = 0; i < images.size(); i++)
 	{
 		std::cout << "-----------------------------------" << std::endl;
+		std::cout << images[i].GetHandle() << std::endl;
 		std::cout << "Type: " << images[i].GetType() << std::endl;
 		std::cout << "Layout: " << images[i].GetLayout() << std::endl;
 		std::cout << "Width: " << images[i].GetWidth() << std::endl;
@@ -141,7 +142,7 @@ int main()
 
 
 	
-
+	system("pause");
 	logicalDevice.DestroySwapchain(swapchain);
 	logicalDevice.Destroy();
 	instance.Destroy();

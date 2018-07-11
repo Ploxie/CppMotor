@@ -78,12 +78,17 @@ namespace Vulkan
 		vkGetSwapchainImagesKHR(internal, swapchain, &swapchainProperties.imageCount, swapchainImages.data());
 
 		std::vector<Image> images;
+		std::vector<ImageView> imageViews;
 		for (uint i = 0; i < swapchainProperties.imageCount; i++)
 		{
-			images.push_back(Image(swapchainImages[i], VK_IMAGE_TYPE_2D, VK_IMAGE_LAYOUT_UNDEFINED, swapchainProperties.extent.width, swapchainProperties.extent.height, 1));
+			Image image = Image(swapchainImages[i], VK_IMAGE_TYPE_2D, VK_IMAGE_LAYOUT_UNDEFINED, swapchainProperties.extent.width, swapchainProperties.extent.height, 1);
+			ImageView imageView = CreateImageView(image, properties.surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
+
+			images.push_back(image);
+			imageViews.push_back(imageView);
 		}
 
-		return Swapchain(swapchain, swapchainProperties, images);
+		return Swapchain(swapchain, swapchainProperties, images, imageViews);
 	}
 
 	const Image LogicalDevice::CreateImage(const ImageType& imageType, const ImageFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const
@@ -147,7 +152,14 @@ namespace Vulkan
 		
 	void LogicalDevice::DestroySwapchain(const Swapchain& swapchain)
 	{
+
+		for (uint i = 0; i < swapchain.GetImageViews().size(); i++)
+		{
+			vkDestroyImageView(internal, swapchain.GetImageViews()[i], 0);
+		}
+		
 		vkDestroySwapchainKHR(internal, swapchain.GetHandle(), 0);
+		
 	}
 
 	void LogicalDevice::Destroy()
