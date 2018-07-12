@@ -7,6 +7,7 @@
 #include <GLFWWindow.h>
 #include "VulkanInstanceProperties.h"
 
+#include <VulkanFileUtil.h>
 
 using namespace Engine;
 
@@ -112,7 +113,7 @@ int main()
 	swapchainProperties.surfaceFormat = GetSurfaceFormat(surfaceProperties.formats);
 	swapchainProperties.transformFlags = surfaceProperties.capabilities.currentTransform;
 	swapchainProperties.presentMode = GetPresentMode(surfaceProperties.presentModes);
-	swapchainProperties.extent = VkExtent2D{800,600};
+	swapchainProperties.extent = VkExtent2D {800,600};
 	
 	Vulkan::Swapchain swapchain = logicalDevice.CreateSwapchain(swapchainProperties);
 
@@ -131,6 +132,12 @@ int main()
 		std::cout << "-----------------------------------" << std::endl;
 		std::cout << std::endl;
 	}
+
+	auto vertShaderCode = Vulkan::IO::readFile("D:/Programming/C++/Motor/Motor/quad.vert.spv");
+	
+	Vulkan::ShaderStage vertShader = logicalDevice.CreateShaderStage(vertShaderCode, VK_SHADER_STAGE_VERTEX_BIT);
+
+
 	//Vulkan::QueueFamilyProperties graphicsQueue = *physicalDevice.GetFirstGraphicsQueue();
 
 	//Vulkan::LogicalDevice logicalDevice = physicalDevice.CreateLogicalDevice({ VK_KHR_SWAPCHAIN_EXTENSION_NAME }, { { graphicsQueue,  1.0f } });
@@ -140,9 +147,9 @@ int main()
 	//Vulkan::Surface surface = instance.CreateWindowSurface(window->GetHandle());
 	
 
-
 	
 	system("pause");
+	logicalDevice.DestroyShaderStage(vertShader);
 	logicalDevice.DestroySwapchain(swapchain);
 	logicalDevice.Destroy();
 	instance.Destroy();

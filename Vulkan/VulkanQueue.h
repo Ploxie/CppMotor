@@ -11,6 +11,7 @@ namespace Vulkan
 
 	private:
 		VkQueue internal;
+		float f;
 	};
 
 	inline Queue::Queue() : internal(0)

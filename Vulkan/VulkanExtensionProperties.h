@@ -4,5 +4,4 @@
 namespace Vulkan
 {
 	typedef VkExtensionProperties ExtensionProperties;
-
 }

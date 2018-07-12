@@ -13,6 +13,9 @@
     <Filter Include="Collections">
       <UniqueIdentifier>{3d47aee3-0df6-4ab9-8da6-0776b32dae33}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IO">
+      <UniqueIdentifier>{66bf0d4b-3c01-4f75-950f-ac41fa6ed768}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix4f.h">

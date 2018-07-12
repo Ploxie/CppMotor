@@ -8,7 +8,8 @@
 namespace Vulkan
 {
 	
-	LogicalDevice::LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueueFamilyIndices& queueFamilyIndices) : internal(internal), physicalDevice(physicalDevice), queueFamilyIndices(queueFamilyIndices)
+	LogicalDevice::LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueueFamilyIndices& queueFamilyIndices)
+		: internal(internal), physicalDevice(physicalDevice), queueFamilyIndices(queueFamilyIndices)
 	{
 		VkQueue graphicsQueue;
 		VkQueue computeQueue;
@@ -21,6 +22,8 @@ namespace Vulkan
 		this->graphicsQueue = Queue(graphicsQueue);
 		this->computeQueue = Queue(computeQueue);
 		this->transferQueue = Queue(transferQueue);
+
+		
 	}
 
 	const Swapchain LogicalDevice::CreateSwapchain(const SwapchainProperties& properties, const Swapchain* oldSwapchain) const
@@ -91,6 +94,110 @@ namespace Vulkan
 		return Swapchain(swapchain, swapchainProperties, images, imageViews);
 	}
 
+	const Vulkan::Pipeline LogicalDevice::CreatePipeline(const PipelineProperties& properties)
+	{
+		
+		std::vector<VkPipelineShaderStageCreateInfo> shaderStages(properties.shaderStages.size());
+		for (uint i = 0; i < shaderStages.size(); i++)
+		{
+			shaderStages[i] = properties.shaderStages[i].GetStageInfo();
+		}
+
+		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputInfo.vertexBindingDescriptionCount = properties.vertexInputInfo.vertexBindingDescriptionCount;
+		vertexInputInfo.pVertexBindingDescriptions = properties.vertexInputInfo.pVertexBindingDescriptions;
+		vertexInputInfo.vertexAttributeDescriptionCount = properties.vertexInputInfo.vertexAttributeDescriptionCount;
+		vertexInputInfo.pVertexAttributeDescriptions = properties.vertexInputInfo.pVertexAttributeDescriptions;
+
+		VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
+		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+		inputAssembly.topology = properties.inputAssemblyState.topology;
+		inputAssembly.primitiveRestartEnable = properties.inputAssemblyState.primitiveRestartEnable;
+		
+		VkPipelineViewportStateCreateInfo viewportState = {};
+		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewportState.viewportCount = properties.viewportState.viewportCount;
+		viewportState.pViewports = properties.viewportState.pViewports;
+		viewportState.scissorCount = properties.viewportState.scissorCount;
+		viewportState.pScissors = properties.viewportState.pScissors;
+
+		VkPipelineRasterizationStateCreateInfo rasterizer = {};
+		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+		rasterizer.depthClampEnable = properties.rasterizationStateInfo.depthClampEnable;
+		rasterizer.rasterizerDiscardEnable = properties.rasterizationStateInfo.rasterizerDiscardEnable;
+		rasterizer.polygonMode = properties.rasterizationStateInfo.polygonMode;
+		rasterizer.cullMode = properties.rasterizationStateInfo.cullMode;
+		rasterizer.frontFace = properties.rasterizationStateInfo.frontFace;
+		rasterizer.depthBiasEnable = properties.rasterizationStateInfo.depthBiasEnable;
+		rasterizer.lineWidth = properties.rasterizationStateInfo.lineWidth;
+
+		VkPipelineMultisampleStateCreateInfo multisampling = {};
+		multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+		multisampling.rasterizationSamples = properties.multisampleState.rasterizationSamples;
+		multisampling.sampleShadingEnable = properties.multisampleState.sampleShadingEnable;
+		
+		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+		colorBlendAttachment.blendEnable = properties.colorBlendAttachmentState.blendEnable;
+		colorBlendAttachment.srcColorBlendFactor = properties.colorBlendAttachmentState.srcColorBlendFactor;
+		colorBlendAttachment.dstColorBlendFactor = properties.colorBlendAttachmentState.dstColorBlendFactor;
+		colorBlendAttachment.colorBlendOp = properties.colorBlendAttachmentState.colorBlendOp;
+		colorBlendAttachment.srcAlphaBlendFactor = properties.colorBlendAttachmentState.srcAlphaBlendFactor;
+		colorBlendAttachment.dstAlphaBlendFactor = properties.colorBlendAttachmentState.dstAlphaBlendFactor;
+		colorBlendAttachment.alphaBlendOp = properties.colorBlendAttachmentState.alphaBlendOp;
+		colorBlendAttachment.colorWriteMask = properties.colorBlendAttachmentState.colorWriteMask;
+
+		VkPipelineColorBlendStateCreateInfo colorBlending = {};
+		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+		colorBlending.logicOpEnable = properties.colorBlendState.logicOpEnable;
+		colorBlending.logicOp = properties.colorBlendState.logicOp;
+		colorBlending.attachmentCount = properties.colorBlendState.attachmentCount;
+		colorBlending.pAttachments = &colorBlendAttachment;
+		colorBlending.blendConstants[0] = properties.colorBlendState.blendConstants[0];
+		colorBlending.blendConstants[1] = properties.colorBlendState.blendConstants[1];
+		colorBlending.blendConstants[2] = properties.colorBlendState.blendConstants[2];
+		colorBlending.blendConstants[3] = properties.colorBlendState.blendConstants[3];
+
+		VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
+		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineLayoutInfo.setLayoutCount = properties.layoutInfo.setLayoutCount;
+		pipelineLayoutInfo.pushConstantRangeCount = properties.layoutInfo.pushConstantRangeCount;
+		
+		VkPipelineLayout pipelineLayout;
+
+		if (vkCreatePipelineLayout(internal, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create pipeline layout!");
+		}
+
+		VkGraphicsPipelineCreateInfo pipelineInfo = {};
+		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipelineInfo.stageCount = 2;
+		pipelineInfo.pStages = shaderStages.data();
+		pipelineInfo.pVertexInputState = &vertexInputInfo;
+		pipelineInfo.pInputAssemblyState = &inputAssembly;
+		pipelineInfo.pViewportState = &viewportState;
+		pipelineInfo.pRasterizationState = &rasterizer;
+		pipelineInfo.pMultisampleState = &multisampling;
+		pipelineInfo.pColorBlendState = &colorBlending;
+		pipelineInfo.layout = pipelineLayout;
+		//pipelineInfo.renderPass = renderPass;
+		pipelineInfo.subpass = 0;
+		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+
+		Pipeline pipeline;
+
+		if (vkCreateGraphicsPipelines(internal, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create graphics pipeline!");
+		}
+
+		for (uint i = 0; i < properties.shaderStages.size(); i++)
+		{
+			DestroyShaderStage(properties.shaderStages[i]);
+		}
+
+		return Pipeline();
+	}
+
 	const Image LogicalDevice::CreateImage(const ImageType& imageType, const ImageFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const
 	{
 		ImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -149,7 +256,29 @@ namespace Vulkan
 
 		return imageView;
 	}
+
+	const ShaderStage LogicalDevice::CreateShaderStage(const std::vector<char>& sourceCode, const ShaderStageType& shaderType) const
+	{
+		VkShaderModuleCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		createInfo.codeSize = sourceCode.size();
+		createInfo.pCode = reinterpret_cast<const uint32_t*>(sourceCode.data());
+
+		VkShaderModule shaderModule;
+
+		VkResult result = vkCreateShaderModule(internal, &createInfo, nullptr, &shaderModule);
+		if (result != VK_SUCCESS) {
+			std::cerr << "Failed to create Shader Module: " << translateVulkanResult(result) << std::endl;
+		}
+
+		return ShaderStage(shaderModule, shaderType);
+	}
 		
+	void LogicalDevice::DestroyShaderStage(const ShaderStage& module)
+	{
+		vkDestroyShaderModule(internal, module.GetModule(), 0);
+	}
+
 	void LogicalDevice::DestroySwapchain(const Swapchain& swapchain)
 	{
 

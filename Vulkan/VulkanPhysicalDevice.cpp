@@ -99,6 +99,7 @@ namespace Vulkan
 			std::cerr << "Failed to create logical device: " << translateVulkanResult(result) << std::endl;
 		}
 
+
 		return LogicalDevice(device,*this, queueFamilyIndices);
 	}
 

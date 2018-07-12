@@ -49,6 +49,12 @@
     <Filter Include="Image">
       <UniqueIdentifier>{6e292d2d-0c48-42be-9909-b5a75718e724}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{06d090c0-0bfa-4a4d-8402-5e544b5440a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pipeline">
+      <UniqueIdentifier>{a06cf424-8a18-4183-8da4-b1b03d8ac7eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanUtil.h">
@@ -117,6 +123,18 @@
     </ClInclude>
     <ClInclude Include="VulkanQueueFlags.h">
       <Filter>Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanFileUtil.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanShaderStage.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPipelineProperties.h">
+      <Filter>Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPipeline.h">
+      <Filter>Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

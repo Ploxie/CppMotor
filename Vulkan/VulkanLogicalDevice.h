@@ -5,6 +5,10 @@
 #include "VulkanQueueFamilyIndices.h"
 #include "VulkanSwapchain.h"
 #include "VulkanImageView.h"
+#include "VulkanShaderStage.h"
+
+#include "VulkanPipeline.h"
+#include "VulkanPipelineProperties.h"
 
 namespace Vulkan
 {
@@ -14,17 +18,22 @@ namespace Vulkan
 	{
 	public:
 		LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueueFamilyIndices& queueFamilyIndices);
-		
+				
 		const Swapchain CreateSwapchain(const SwapchainProperties& properties, const Swapchain* oldSwapchain = nullptr) const;
+		const Pipeline CreatePipeline(const PipelineProperties& properties);
+		
 		const Image CreateImage(const ImageType& imageType, const ImageFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const;
 		const ImageView CreateImageView(const Image& image, const ImageFormat& format, const ImageAspectFlags& aspectFlags) const;
 
-		inline const Queue& GetGraphicsQueue() const;
-		inline const Queue& GetComputeQueue() const;
-		inline const Queue& GetTransferQueue() const;
-
+		const ShaderStage CreateShaderStage(const std::vector<char>& sourceCode, const ShaderStageType& shaderType) const;
+		
+		void DestroyShaderStage(const ShaderStage& module);
 		void DestroySwapchain(const Swapchain& swapchain);
 		void Destroy();
+
+		inline const Queue& GetGraphicsQueue() const;
+		inline const Queue& GetComputeQueue() const;
+		inline const Queue& GetTransferQueue() const;		
 
 	protected:
 		const VkDevice internal;
