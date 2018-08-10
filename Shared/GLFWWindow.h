@@ -27,10 +27,22 @@ namespace Engine
 		void SetTitle(const char* title) override;
 
 		void SetWindowMode(const WindowMode& windowMode) override;
-
-		const WindowHandle GetHandle() const override;
+		
+		inline const GLFWwindow* GetInternal() const;
+		inline GLFWwindow* GetInternal();
 
 	protected:
 		GLFWwindow* window;
 	};
+
+	inline const GLFWwindow* GLFWWindow::GetInternal() const
+	{
+		return window;
+	}
+
+	inline GLFWwindow* GLFWWindow::GetInternal()
+	{
+		return window;
+	}
+
 };

@@ -14,10 +14,6 @@ int main()
 	Window* window = new GLFWWindow(50, 50 , "ASD", WINDOWED);
 	window->Create();
 	
-	WindowHandle handle = window->GetHandle();
-
-	std::cout << handle << std::endl;
-
 	system("pause");
 	return 0;
 }

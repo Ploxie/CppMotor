@@ -24,8 +24,6 @@ namespace Engine
 
 		virtual void SetWindowMode(const WindowMode& windowMode) = 0;
 
-		virtual const WindowHandle GetHandle() const = 0;
-
 	protected:
 		const char* title;
 		int width;

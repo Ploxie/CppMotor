@@ -1,63 +1,58 @@
 #pragma once
 #include "stdafx.h"
+#include <unordered_map>
 #include "VulkanQueue.h"
-#include "VulkanQueueFamilyProperties.h"
 #include "VulkanQueueFamilyIndices.h"
 #include "VulkanSwapchain.h"
-#include "VulkanImageView.h"
 #include "VulkanShaderStage.h"
 
-#include "VulkanPipeline.h"
-#include "VulkanPipelineProperties.h"
+#include "RenderingUtil.h"
+#include "ILogicalGraphicsDevice.h"
 
 namespace Vulkan
 {
 	class PhysicalDevice;
 
-	class LogicalDevice
+	struct QueuesInfo
+	{
+		int  graphicsIndex = -1;
+		int  computeIndex = -1;
+		int  transferIndex = -1;
+		uint graphicsQueueCount = 0;
+		uint computeQueueCount = 0;
+		uint transferQueueCount = 0;
+	};
+
+	class LogicalDevice : public ILogicalGraphicsDevice
 	{
 	public:
-		LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueueFamilyIndices& queueFamilyIndices);
+		LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueuesInfo& queuesInfo);
 				
+		const VkRenderPass CreateRenderPass() const;
+
+		const VkPipeline CreatePipeline(const VkRenderPass& renderPass, const GraphicsPipelineProperties& properties);
+
 		const Swapchain CreateSwapchain(const SwapchainProperties& properties, const Swapchain* oldSwapchain = nullptr) const;
-		const Pipeline CreatePipeline(const PipelineProperties& properties);
+
+		const VkFramebuffer CreateFrameBuffer(const VkRenderPass& renderPass, const VkExtent2D& dimensions, const std::vector<VkImageView>& attachments) const;
 		
-		const Image CreateImage(const ImageType& imageType, const ImageFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const;
-		const ImageView CreateImageView(const Image& image, const ImageFormat& format, const ImageAspectFlags& aspectFlags) const;
+		const Image CreateImage(const ImageType& imageType, const VkFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const;
+		const VkImageView CreateImageView(const Image& image, const VkFormat& format, const VkImageAspectFlags& aspectFlags) const;
 
 		const ShaderStage CreateShaderStage(const std::vector<char>& sourceCode, const ShaderStageType& shaderType) const;
 		
+		const Queue& GetDeviceQueue(const uint queueFamilyIndex, const uint queueIndex);
+
 		void DestroyShaderStage(const ShaderStage& module);
 		void DestroySwapchain(const Swapchain& swapchain);
-		void Destroy();
-
-		inline const Queue& GetGraphicsQueue() const;
-		inline const Queue& GetComputeQueue() const;
-		inline const Queue& GetTransferQueue() const;		
+		void Destroy();		
 
 	protected:
 		const VkDevice internal;
 		const PhysicalDevice& physicalDevice;
+		
+		std::unordered_map<std::string, Queue> deviceQueues;
 
-		Queue graphicsQueue;
-		Queue computeQueue;
-		Queue transferQueue;
-
-		QueueFamilyIndices queueFamilyIndices;		
+		QueuesInfo queuesInfo;
 	};
-
-	inline const Queue& LogicalDevice::GetGraphicsQueue() const
-	{			
-		return graphicsQueue;
-	}
-
-	inline const Queue& LogicalDevice::GetComputeQueue() const
-	{
-		return computeQueue;
-	}
-
-	inline const Queue& LogicalDevice::GetTransferQueue() const
-	{
-		return transferQueue;
-	}
 }

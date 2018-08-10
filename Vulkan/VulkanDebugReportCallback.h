@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include <iostream>
 #include "VulkanUtil.h"
 
 namespace Vulkan
@@ -27,9 +26,7 @@ namespace Vulkan
 		const char* layerPrefix,
 		const char* msg,
 		void* userData) {
-
-		std::cerr << "validation layer: " << msg << std::endl;
-
+		
 		return VK_FALSE;
 	}
 
@@ -65,7 +62,7 @@ namespace Vulkan
 		VkResult result = CreateDebugReportCallbackEXT(instance, &createInfo, nullptr, &callback);
 		if (result != VK_SUCCESS)
 		{
-			std::cerr << "Failed to setup debug callback: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to setup debug callback: " + VulkanUtil::translateVulkanResult(result));
 		}
 
 		created = true;

@@ -2,7 +2,11 @@
 #include "stdafx.h"
 #include <vector>
 #include "VulkanPhysicalDevice.h"
-#include "VulkanSurface.h"
+
+namespace Engine
+{
+	class GLFWWindow;
+}
 
 namespace Vulkan
 {
@@ -13,7 +17,7 @@ namespace Vulkan
 	public:
 		Instance(const InstanceProperties& properties);
 		
-		const Surface CreateSurface(const WindowHandle& window) const;
+		const VkSurfaceKHR CreateSurface(Engine::GLFWWindow& window) const;
 
 
 		//TODO: Add Method to find device with certain properties

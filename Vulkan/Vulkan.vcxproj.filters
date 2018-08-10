@@ -17,6 +17,12 @@
     <ClCompile Include="VulkanLogicalDevice.cpp">
       <Filter>Device\Logical</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanMemoryAllocator.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanCommandBuffer.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Instance">
@@ -52,8 +58,14 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{06d090c0-0bfa-4a4d-8402-5e544b5440a1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Pipeline">
-      <UniqueIdentifier>{a06cf424-8a18-4183-8da4-b1b03d8ac7eb}</UniqueIdentifier>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{87ea6665-ffd3-4a34-962f-7079466ca271}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Buffer">
+      <UniqueIdentifier>{d790ba5a-8bae-4503-8e6b-c3fd2e519e8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{e03be11b-ea38-4209-a41b-f820ddef8d3b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,9 +87,6 @@
     <ClInclude Include="VulkanQueue.h">
       <Filter>Queue</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanQueueFamilyProperties.h">
-      <Filter>Queue</Filter>
-    </ClInclude>
     <ClInclude Include="VulkanVersion.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -85,23 +94,8 @@
       <Filter>Swapchain</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="VulkanSurface.h">
-      <Filter>Swapchain\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanPhysicalDeviceProperties.h">
-      <Filter>Device\Physical</Filter>
-    </ClInclude>
     <ClInclude Include="VulkanPhysicalDevice.h">
       <Filter>Device\Physical</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanPhysicalDeviceFeatures.h">
-      <Filter>Device\Physical</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanPhysicalDeviceMemoryProperties.h">
-      <Filter>Device\Physical</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanExtensionProperties.h">
-      <Filter>Device</Filter>
     </ClInclude>
     <ClInclude Include="VulkanLogicalDevice.h">
       <Filter>Device\Logical</Filter>
@@ -112,17 +106,8 @@
     <ClInclude Include="VulkanSwapchainProperties.h">
       <Filter>Swapchain</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanImageView.h">
-      <Filter>Image</Filter>
-    </ClInclude>
     <ClInclude Include="VulkanImage.h">
       <Filter>Image</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanQueueFamilyIndices.h">
-      <Filter>Queue</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanQueueFlags.h">
-      <Filter>Queue</Filter>
     </ClInclude>
     <ClInclude Include="VulkanFileUtil.h">
       <Filter>Util</Filter>
@@ -130,11 +115,21 @@
     <ClInclude Include="VulkanShaderStage.h">
       <Filter>Shader</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanPipelineProperties.h">
-      <Filter>Pipeline</Filter>
+    <ClInclude Include="VulkanMemoryUsage.h">
+      <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanPipeline.h">
-      <Filter>Pipeline</Filter>
+    <ClInclude Include="VulkanMemoryAllocator.h">
+      <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanCommandBuffer.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanMemoryAllocation.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanAttachment.h" />
+    <ClInclude Include="VulkanFrameBuffer.h" />
+    <ClInclude Include="VulkanRenderPass.h" />
+    <ClInclude Include="VulkanSubPass.h" />
   </ItemGroup>
 </Project>

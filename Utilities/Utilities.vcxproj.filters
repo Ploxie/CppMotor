@@ -16,13 +16,13 @@
     <Filter Include="IO">
       <UniqueIdentifier>{66bf0d4b-3c01-4f75-950f-ac41fa6ed768}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Logging">
+      <UniqueIdentifier>{680ddfda-8bd8-4746-91da-5a92c1602528}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix4f.h">
       <Filter>Math\Matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="Math.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Matrix3f.h">
       <Filter>Math\Matrix</Filter>
@@ -43,8 +43,25 @@
       <Filter>Collections</Filter>
     </ClInclude>
     <ClInclude Include="BasicTypes.h" />
+    <ClInclude Include="FastMath.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Logging.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FastMath.inl">
+      <Filter>Math</Filter>
+    </None>
   </ItemGroup>
 </Project>

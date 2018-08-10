@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "VulkanSwapchainProperties.h"
 #include "VulkanImage.h"
-#include "VulkanImageView.h"
 
 namespace Vulkan
 {
@@ -10,21 +9,22 @@ namespace Vulkan
 	class Swapchain
 	{
 	public:
-		inline Swapchain(const VkSwapchainKHR& swapchain, const SwapchainProperties& properties, const std::vector<Image>& images, const std::vector<ImageView>& imageViews);
+		inline Swapchain(const VkSwapchainKHR& swapchain, const SwapchainProperties& properties, const std::vector<Image>& images, const std::vector<VkImageView>& imageViews);
 
 		inline const VkSwapchainKHR& GetHandle() const;
 		inline const SwapchainProperties& GetProperties() const;
 		inline const std::vector<Image>& GetImages() const;
-		inline const std::vector<ImageView>& GetImageViews() const;
+		inline const std::vector<VkImageView>& GetImageViews() const;
 
 	private:
+
 		const VkSwapchainKHR internal;
 		const SwapchainProperties properties;
 		const std::vector<Image> images;
-		const std::vector<ImageView> imageViews;
+		const std::vector<VkImageView> imageViews;
 	};
 
-	inline Swapchain::Swapchain(const VkSwapchainKHR& swapchain, const SwapchainProperties& properties, const std::vector<Image>& images, const std::vector<ImageView>& imageViews) : internal(swapchain), properties(properties), images(images), imageViews(imageViews)
+	inline Swapchain::Swapchain(const VkSwapchainKHR& swapchain, const SwapchainProperties& properties, const std::vector<Image>& images, const std::vector<VkImageView>& imageViews) : internal(swapchain), properties(properties), images(images), imageViews(imageViews)
 	{
 
 	}
@@ -44,7 +44,7 @@ namespace Vulkan
 		return images;
 	}
 
-	inline const std::vector<ImageView>& Swapchain::GetImageViews() const
+	inline const std::vector<VkImageView>& Swapchain::GetImageViews() const
 	{
 		return imageViews;
 	}

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <ostream>
-#include "Math.h"
+#include "FastMath.h"
 
 namespace Math
 {

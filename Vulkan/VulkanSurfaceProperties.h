@@ -4,14 +4,10 @@
 
 namespace Vulkan
 {
-	typedef VkSurfaceCapabilitiesKHR SurfaceCapabilities;
-	typedef VkSurfaceFormatKHR SurfaceFormat;
-	typedef VkPresentModeKHR PresentMode;
-
 	struct SurfaceProperties
 	{
-		SurfaceCapabilities capabilities;
-		std::vector<SurfaceFormat> formats;
-		std::vector<PresentMode> presentModes;
+		VkSurfaceCapabilitiesKHR capabilities;
+		std::vector<VkSurfaceFormatKHR> formats;
+		std::vector<VkPresentModeKHR> presentModes;
 	};
 }

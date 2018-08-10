@@ -1,47 +1,48 @@
 #pragma once
 #include "stdafx.h"
-#include "VulkanPhysicalDeviceProperties.h"
-#include "VulkanPhysicalDeviceFeatures.h"
-#include "VulkanPhysicalDeviceMemoryProperties.h"
-#include "VulkanQueueFlags.h"
-#include "VulkanExtensionProperties.h"
 #include <vector>
-#include "VulkanQueueFamilyProperties.h"
 #include "VulkanLogicalDevice.h"
-#include "VulkanSurface.h"
 #include "VulkanSurfaceProperties.h"
+
+#include "IPhysicalGraphicsDevice.h"
 
 
 namespace Vulkan
 {
-	class PhysicalDevice
+	class PhysicalDevice : public IPhysicalGraphicsDevice
 	{
 	public:
 		inline PhysicalDevice();
 		PhysicalDevice(const VkPhysicalDevice& physicalDevice);
 		
-		const LogicalDevice CreateLogicalDevice(const PhysicalDeviceFeatures& enabledFeatures, const std::vector<const char*>& extensions, const QueueFlags& queueFlags) const;
+		const ILogicalGraphicsDevice CreateLogicalDevice(const std::vector<std::string>& extensions, const uint graphicsQueueCount, const uint computeQueueCount) const override;
 
-		const SurfaceProperties GetSurfaceProperties(const Surface& surface) const;
+		const SurfaceProperties GetSurfaceProperties(const VkSurfaceKHR& surface) const;
 				
 		const uint GetQueueFamilyIndex(const VkQueueFlags& flagBit) const;
 		const bool IsExtensionSupported(const char* extension, const uint& minVersion) const;
-		const int GetPresentQueueFamilyIndex(const Surface& surface) const;
+		const int GetPresentQueueFamilyIndex(const VkSurfaceKHR& surface) const;
 
-		inline const PhysicalDeviceProperties& GetProperties() const;
-		inline const PhysicalDeviceFeatures& GetFeatures() const;
-		inline const PhysicalDeviceMemoryProperties& GetMemoryProperties() const;
-		inline const std::vector<QueueFamilyProperties>& GetQueueFamilyProperties() const;
-		inline const std::vector<ExtensionProperties>& GetSupportedExtensions() const;
+		inline const VkPhysicalDeviceProperties& GetProperties() const;
+		inline const VkPhysicalDeviceFeatures& GetFeatures() const;
+		inline const VkPhysicalDeviceMemoryProperties& GetMemoryProperties() const;
+		inline const std::vector<VkQueueFamilyProperties>& GetQueueFamilyProperties() const;
+		inline const std::vector<VkExtensionProperties>& GetSupportedExtensions() const;
+
+
+		inline const std::string GetName() const override;
+		inline const uint GetDriverVersion() const override;
+		inline const uint GetVendorId() const override;
+		inline const uint GetDeviceId() const override;
 
 	protected:
 		VkPhysicalDevice internal;
-		PhysicalDeviceProperties properties;
-		PhysicalDeviceFeatures features;
-		PhysicalDeviceMemoryProperties memoryProperties;
+		VkPhysicalDeviceProperties properties;
+		VkPhysicalDeviceFeatures features;
+		VkPhysicalDeviceMemoryProperties memoryProperties;
 
-		std::vector<QueueFamilyProperties> queueFamilyProperties;
-		std::vector<ExtensionProperties> supportedExtensions;
+		std::vector<VkQueueFamilyProperties> queueFamilyProperties;
+		std::vector<VkExtensionProperties> supportedExtensions;
 	};
 
 	inline PhysicalDevice::PhysicalDevice() : internal(0)
@@ -49,29 +50,49 @@ namespace Vulkan
 
 	}
 
-	inline const PhysicalDeviceProperties& PhysicalDevice::GetProperties() const
+	inline const VkPhysicalDeviceProperties& PhysicalDevice::GetProperties() const
 	{
 		return properties;
 	}
 
-	inline const PhysicalDeviceFeatures& PhysicalDevice::GetFeatures() const
+	inline const VkPhysicalDeviceFeatures& PhysicalDevice::GetFeatures() const
 	{
 		return features;
 	}
 
-	inline const PhysicalDeviceMemoryProperties& PhysicalDevice::GetMemoryProperties() const
+	inline const VkPhysicalDeviceMemoryProperties& PhysicalDevice::GetMemoryProperties() const
 	{
 		return memoryProperties;
 	}
 
-	inline const std::vector<QueueFamilyProperties>& PhysicalDevice::GetQueueFamilyProperties() const
+	inline const std::vector<VkQueueFamilyProperties>& PhysicalDevice::GetQueueFamilyProperties() const
 	{
 		return queueFamilyProperties;
 	}
 
-	inline const std::vector<ExtensionProperties>& PhysicalDevice::GetSupportedExtensions() const
+	inline const std::vector<VkExtensionProperties>& PhysicalDevice::GetSupportedExtensions() const
 	{
 		return supportedExtensions;
+	}
+
+	inline const std::string PhysicalDevice::GetName() const
+	{
+		return std::string(properties.deviceName);
+	}
+
+	inline const uint PhysicalDevice::GetDriverVersion() const
+	{
+		return properties.driverVersion;
+	}
+
+	inline const uint PhysicalDevice::GetVendorId() const
+	{
+		return properties.vendorID;
+	}
+
+	inline const uint PhysicalDevice::GetDeviceId() const
+	{
+		return properties.deviceID;
 	}
 
 }

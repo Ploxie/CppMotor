@@ -77,10 +77,6 @@ namespace Engine
 		
 	}
 
-	const WindowHandle GLFWWindow::GetHandle() const
-	{
-		return glfwGetWin32Window(window);
-	}
-
+	
 
 }

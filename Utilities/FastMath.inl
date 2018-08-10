@@ -1,14 +1,9 @@
 #pragma once
-#include <cmath>
+#include "FastMath.h"
 
 namespace Math
 {
-	const float F_PI = 3.141592653589793f;
-	const float F_DEG2RAD = F_PI / 180.0f;
-	const float F_RAD2DEG = 180.0f / F_PI;
-	const float F_EPSILON = 0.00001f;
-
-	inline const float ToRadians(const float& angleDegrees) 
+	inline const float ToRadians(const float& angleDegrees)
 	{
 		return angleDegrees * F_DEG2RAD;
 	}
@@ -33,12 +28,12 @@ namespace Math
 		return sin(f) / cos(f);
 	}
 
-	inline const int clamp(const int& value, const int& min, const int& max) 
+	inline const int clamp(const int& value, const int& min, const int& max)
 	{
 		return value < min ? min : value > max ? max : value;
 	}
 
-	inline const float clamp(const float& value, const float& min, const float& max) 
+	inline const float clamp(const float& value, const float& min, const float& max)
 	{
 		return value < min ? min : value > max ? max : value;
 	}
@@ -93,7 +88,7 @@ namespace Math
 		return (i >= 0) ? i : -i;
 	}
 
-	inline const int floor(const float& f) 
+	inline const int floor(const float& f)
 	{
 		int i = (int)f;
 		return (f < 0 && f != i) ? i - 1 : i;
@@ -125,5 +120,14 @@ namespace Math
 	inline const float atan2(const float& b, const float& a)
 	{
 		return std::atan2f(b, a);
+	}
+
+	inline unsigned int countBitsSet(unsigned int x) {
+		x = x - ((x >> 1) & 0x55555555);
+		x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+		x = (x + (x >> 4)) & 0x0F0F0F0F;
+		x = x + (x >> 8);
+		x = x + (x >> 16);
+		return x & 0x0000003F;
 	}
 }

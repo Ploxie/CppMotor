@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "VulkanInstance.h"
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include "VulkanInstanceProperties.h"
 #include "VulkanUtil.h"
+#include "GLFWWindow.h"
 
 namespace Vulkan
 {
@@ -58,15 +58,15 @@ namespace Vulkan
 		VkInstanceCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createInfo.pApplicationInfo = &appInfo;
-		createInfo.enabledExtensionCount = extensions.size();
+		createInfo.enabledExtensionCount = static_cast<uint>(extensions.size());
 		createInfo.ppEnabledExtensionNames = extensions.data();
-		createInfo.enabledLayerCount = layers.size();
+		createInfo.enabledLayerCount = static_cast<uint>(layers.size());
 		createInfo.ppEnabledLayerNames = layers.data();
 
 		VkResult result = vkCreateInstance(&createInfo, 0, &internal);
 		if (result != VK_SUCCESS)
 		{
-			std::cerr << "Failed to create Vulkan Instance: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to create Vulkan Instance: " + VulkanUtil::translateVulkanResult(result));
 		}
 	}
 
@@ -75,26 +75,11 @@ namespace Vulkan
 		vkDestroyInstance(internal, 0);
 	}
 
-	const Surface Instance::CreateSurface(const WindowHandle& window) const
+	const VkSurfaceKHR Instance::CreateSurface(Engine::GLFWWindow& window) const
 	{
-		VkWin32SurfaceCreateInfoKHR createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		createInfo.hwnd = window;
-		createInfo.hinstance = GetModuleHandle(nullptr);
+		VkSurfaceKHR surface;
 
-		auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(internal, "vkCreateWin32SurfaceKHR");
-
-		if (!CreateWin32SurfaceKHR) {
-			std::cerr << "Failed to find function: vkCreateWin32SurfaceKHR" << std::endl;
-		}
-
-		Surface surface;
-
-		VkResult result = CreateWin32SurfaceKHR(internal, &createInfo, 0, &surface);
-		if (result != VK_SUCCESS) {
-			std::cerr << "Failed to create window surface: " << translateVulkanResult(result) << std::endl;
-		}
-
+		glfwCreateWindowSurface(internal, window.GetInternal(), 0, &surface);
 		return surface;
 	}
 	
@@ -104,7 +89,7 @@ namespace Vulkan
 		vkEnumeratePhysicalDevices(internal, &deviceCount, nullptr);
 
 		if (deviceCount == 0) {			
-			std::cerr << "Failed to find Devices with Vulkan support!" << std::endl;
+			Logging::showError("Failed to find Devices with Vulkan support!");
 		}
 
 		std::vector<VkPhysicalDevice> devices(deviceCount);

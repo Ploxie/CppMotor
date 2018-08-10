@@ -1,29 +1,51 @@
-#pragma once
 #include "stdafx.h"
 #include "VulkanLogicalDevice.h"
 #include "VulkanUtil.h"
-#include <iostream>
 #include "VulkanPhysicalDevice.h"
 
 namespace Vulkan
 {
 	
-	LogicalDevice::LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueueFamilyIndices& queueFamilyIndices)
-		: internal(internal), physicalDevice(physicalDevice), queueFamilyIndices(queueFamilyIndices)
+	LogicalDevice::LogicalDevice(const VkDevice& internal, const PhysicalDevice& physicalDevice, const QueuesInfo& queuesInfo) : internal(internal), physicalDevice(physicalDevice), queuesInfo(queuesInfo)
 	{
-		VkQueue graphicsQueue;
-		VkQueue computeQueue;
-		VkQueue transferQueue;
-		
-		vkGetDeviceQueue(internal, queueFamilyIndices.graphics, 0, &graphicsQueue);
-		vkGetDeviceQueue(internal, queueFamilyIndices.compute, 0, &computeQueue);
-		vkGetDeviceQueue(internal, queueFamilyIndices.transfer, 0, &transferQueue);
+	}
 
-		this->graphicsQueue = Queue(graphicsQueue);
-		this->computeQueue = Queue(computeQueue);
-		this->transferQueue = Queue(transferQueue);
+	const VkRenderPass LogicalDevice::CreateRenderPass() const
+	{
+		VkAttachmentDescription colorAttachment = {};
+		colorAttachment.format = VK_FORMAT_B8G8R8A8_SNORM; // CHANGE
+		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;		
+		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-		
+		VkAttachmentReference colorAttachmentRef = {};
+		colorAttachmentRef.attachment = 0;
+		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		VkSubpassDescription subpass = {};
+		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.colorAttachmentCount = 1;
+		subpass.pColorAttachments = &colorAttachmentRef;
+
+		VkRenderPassCreateInfo renderPassInfo = {};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassInfo.attachmentCount = 1;
+		renderPassInfo.pAttachments = &colorAttachment;
+		renderPassInfo.subpassCount = 1;
+		renderPassInfo.pSubpasses = &subpass;
+
+		VkRenderPass renderPass;
+		VkResult result = vkCreateRenderPass(internal, &renderPassInfo, 0, &renderPass);
+		if (result != VK_SUCCESS)
+		{
+			Logging::showError("Failed to create render pass: " + VulkanUtil::translateVulkanResult(result));
+		}
+
+		return renderPass;
 	}
 
 	const Swapchain LogicalDevice::CreateSwapchain(const SwapchainProperties& properties, const Swapchain* oldSwapchain) const
@@ -41,18 +63,20 @@ namespace Vulkan
 
 		const int presentQueueIndex = physicalDevice.GetPresentQueueFamilyIndex(properties.surface);
 		
-		if (queueFamilyIndices.graphics == -1)
+		const uint graphicsQueueFamilyIndex = physicalDevice.GetQueueFamilyIndex(VK_QUEUE_GRAPHICS_BIT);
+
+		if (queuesInfo.graphicsIndex == -1)
 		{
-			std::cerr << "Device does not have Swapchain support!" << std::endl;
+			Logging::showError("Device does not have swapchain support!");
 		}
 
 		uint queueFamilyIndices[] =
 		{
-			static_cast<uint>(this->queueFamilyIndices.graphics),
+			static_cast<uint>(this->queuesInfo.graphicsIndex),
 			static_cast<uint>(presentQueueIndex)
 		};
 
-		if (this->queueFamilyIndices.graphics != presentQueueIndex) {
+		if (queuesInfo.graphicsIndex != presentQueueIndex) {
 			createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 			createInfo.queueFamilyIndexCount = 2;
 			createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -71,7 +95,7 @@ namespace Vulkan
 
 		VkResult result = vkCreateSwapchainKHR(internal, &createInfo, nullptr, &swapchain);
 		if (result != VK_SUCCESS) {
-			std::cerr << "Failed to create swapchain: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to create swapchain: " + VulkanUtil::translateVulkanResult(result));
 		}
 
 		SwapchainProperties swapchainProperties = properties;
@@ -81,11 +105,11 @@ namespace Vulkan
 		vkGetSwapchainImagesKHR(internal, swapchain, &swapchainProperties.imageCount, swapchainImages.data());
 
 		std::vector<Image> images;
-		std::vector<ImageView> imageViews;
+		std::vector<VkImageView> imageViews;
 		for (uint i = 0; i < swapchainProperties.imageCount; i++)
 		{
 			Image image = Image(swapchainImages[i], VK_IMAGE_TYPE_2D, VK_IMAGE_LAYOUT_UNDEFINED, swapchainProperties.extent.width, swapchainProperties.extent.height, 1);
-			ImageView imageView = CreateImageView(image, properties.surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
+			VkImageView imageView = CreateImageView(image, properties.surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
 
 			images.push_back(image);
 			imageViews.push_back(imageView);
@@ -94,111 +118,213 @@ namespace Vulkan
 		return Swapchain(swapchain, swapchainProperties, images, imageViews);
 	}
 
-	const Vulkan::Pipeline LogicalDevice::CreatePipeline(const PipelineProperties& properties)
+	const VkFramebuffer LogicalDevice::CreateFrameBuffer(const VkRenderPass& renderPass, const VkExtent2D& dimensions, const std::vector<VkImageView>& attachments) const
+	{
+		VkFramebufferCreateInfo frameBufferInfo = {};
+		frameBufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		frameBufferInfo.renderPass = renderPass;
+		frameBufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+		frameBufferInfo.pAttachments = attachments.data();
+		frameBufferInfo.width = dimensions.width;
+		frameBufferInfo.height = dimensions.height;
+		frameBufferInfo.layers = 1;
+
+		VkFramebuffer frameBuffer;
+		VkResult result = vkCreateFramebuffer(internal, &frameBufferInfo, 0, &frameBuffer);
+		if (result != VK_SUCCESS)
+		{
+			Logging::showError("Failed to create Frame Buffer: " + VulkanUtil::translateVulkanResult(result));
+		}
+
+		return frameBuffer;
+	}
+
+	const VkPipeline LogicalDevice::CreatePipeline(const VkRenderPass& renderPass, const GraphicsPipelineProperties& properties)
 	{
 		
-		std::vector<VkPipelineShaderStageCreateInfo> shaderStages(properties.shaderStages.size());
+		/*std::vector<VkPipelineShaderStageCreateInfo> shaderStages(properties.shaderStages.size());
 		for (uint i = 0; i < shaderStages.size(); i++)
 		{
 			shaderStages[i] = properties.shaderStages[i].GetStageInfo();
+		}*/
+
+		VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = {};
+		inputAssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+		inputAssemblyStateInfo.flags = 0;
+		inputAssemblyStateInfo.topology = VulkanUtil::getTopology(properties.topology);
+		inputAssemblyStateInfo.primitiveRestartEnable = false;
+
+		uint vertexInputBindingDescriptionSize = static_cast<uint>(properties.vertexInputInfo.bindingDescriptions.size());
+		std::vector<VkVertexInputBindingDescription> bindingDescriptions(vertexInputBindingDescriptionSize);
+		for (uint i = 0; i < vertexInputBindingDescriptionSize; i++)
+		{
+			const BindingDescription& bindingDescription = properties.vertexInputInfo.bindingDescriptions[i];
+			VkVertexInputBindingDescription vertexInputBindingDescription = {};
+			vertexInputBindingDescription.binding = bindingDescription.binding;
+			vertexInputBindingDescription.stride = bindingDescription.stride;
+			vertexInputBindingDescription.inputRate = VulkanUtil::getVertexInputRate(bindingDescription.inputRate);
+			bindingDescriptions[i] = vertexInputBindingDescription;
+		}
+
+		uint vertexInputAttributeDescriptionSize = static_cast<uint>(properties.vertexInputInfo.attributeDescriptions.size());
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(vertexInputAttributeDescriptionSize);
+		for (uint i = 0; i < vertexInputAttributeDescriptionSize; i++)
+		{
+			const AttributeDescription& attributeDescription = properties.vertexInputInfo.attributeDescriptions[i];
+			VkVertexInputAttributeDescription vertexInputAttributeDescription = {};
+			vertexInputAttributeDescription.binding = attributeDescription.binding;
+			vertexInputAttributeDescription.location = attributeDescription.location;
+			vertexInputAttributeDescription.format = VulkanUtil::getColorFormat(attributeDescription.format);
+			vertexInputAttributeDescription.offset = attributeDescription.offset;
+			attributeDescriptions[i] = vertexInputAttributeDescription;
 		}
 
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = properties.vertexInputInfo.vertexBindingDescriptionCount;
-		vertexInputInfo.pVertexBindingDescriptions = properties.vertexInputInfo.pVertexBindingDescriptions;
-		vertexInputInfo.vertexAttributeDescriptionCount = properties.vertexInputInfo.vertexAttributeDescriptionCount;
-		vertexInputInfo.pVertexAttributeDescriptions = properties.vertexInputInfo.pVertexAttributeDescriptions;
-
-		VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
-		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-		inputAssembly.topology = properties.inputAssemblyState.topology;
-		inputAssembly.primitiveRestartEnable = properties.inputAssemblyState.primitiveRestartEnable;
+		vertexInputInfo.flags = 0;
+		vertexInputInfo.vertexBindingDescriptionCount = vertexInputBindingDescriptionSize;
+		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = vertexInputAttributeDescriptionSize;
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 		
-		VkPipelineViewportStateCreateInfo viewportState = {};
-		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		viewportState.viewportCount = properties.viewportState.viewportCount;
-		viewportState.pViewports = properties.viewportState.pViewports;
-		viewportState.scissorCount = properties.viewportState.scissorCount;
-		viewportState.pScissors = properties.viewportState.pScissors;
+		VkPipelineViewportStateCreateInfo viewportStateInfo = {};
+		viewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewportStateInfo.viewportCount = 1;
+		viewportStateInfo.pViewports = 0;
+		viewportStateInfo.scissorCount = 1;
+		viewportStateInfo.pScissors = 0;
 
-		VkPipelineRasterizationStateCreateInfo rasterizer = {};
-		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-		rasterizer.depthClampEnable = properties.rasterizationStateInfo.depthClampEnable;
-		rasterizer.rasterizerDiscardEnable = properties.rasterizationStateInfo.rasterizerDiscardEnable;
-		rasterizer.polygonMode = properties.rasterizationStateInfo.polygonMode;
-		rasterizer.cullMode = properties.rasterizationStateInfo.cullMode;
-		rasterizer.frontFace = properties.rasterizationStateInfo.frontFace;
-		rasterizer.depthBiasEnable = properties.rasterizationStateInfo.depthBiasEnable;
-		rasterizer.lineWidth = properties.rasterizationStateInfo.lineWidth;
+		VkPipelineRasterizationStateCreateInfo rasterizationStateInfo = {};
+		rasterizationStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+		rasterizationStateInfo.depthClampEnable = false;
+		rasterizationStateInfo.rasterizerDiscardEnable = false;
+		rasterizationStateInfo.polygonMode = VulkanUtil::getPolygonDrawMode(properties.polygonDrawMode);
+		rasterizationStateInfo.cullMode = VulkanUtil::getCullMode(properties.cullFaceSide);
+		rasterizationStateInfo.frontFace = VulkanUtil::getFrontFaceVertexWinding(properties.frontFaceVertexWinding);
+		rasterizationStateInfo.depthBiasEnable = false;
+		rasterizationStateInfo.lineWidth = properties.lineWidth;
 
-		VkPipelineMultisampleStateCreateInfo multisampling = {};
-		multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-		multisampling.rasterizationSamples = properties.multisampleState.rasterizationSamples;
-		multisampling.sampleShadingEnable = properties.multisampleState.sampleShadingEnable;
+		uint attachmentColorBlendPropertiesSize = static_cast<uint>(properties.attachmentColorBlendProperties.size());
+		std::vector<VkPipelineColorBlendAttachmentState> colorWriteMasks(attachmentColorBlendPropertiesSize);
+		for (uint i = 0; i < attachmentColorBlendPropertiesSize; i++)
+		{
+			const AttachmentColorBlendProperties& attachmentColorBlendProperties = properties.attachmentColorBlendProperties[i];
+			uint colorMask = 0;
+			if (attachmentColorBlendProperties.colorWriteMaskR)
+			{
+				colorMask |= VK_COLOR_COMPONENT_R_BIT;
+			}
+			if (attachmentColorBlendProperties.colorWriteMaskG)
+			{
+				colorMask |= VK_COLOR_COMPONENT_G_BIT;
+			}
+			if (attachmentColorBlendProperties.colorWriteMaskB)
+			{
+				colorMask |= VK_COLOR_COMPONENT_B_BIT;
+			}
+			if (attachmentColorBlendProperties.colorWriteMaskA)
+			{
+				colorMask |= VK_COLOR_COMPONENT_A_BIT;
+			}
+
+			VkPipelineColorBlendAttachmentState colorWriteMask = { };
+			colorWriteMask.blendEnable = attachmentColorBlendProperties.blendEnable;
+			colorWriteMask.srcColorBlendFactor = VulkanUtil::getBlendFactor(attachmentColorBlendProperties.srcColorBlendFactor);
+			colorWriteMask.dstColorBlendFactor = VulkanUtil::getBlendFactor(attachmentColorBlendProperties.dstColorBlendFactor);
+			colorWriteMask.colorBlendOp = VulkanUtil::getBlendOp(attachmentColorBlendProperties.colorBlendOp);
+			colorWriteMask.srcAlphaBlendFactor = VulkanUtil::getBlendFactor(attachmentColorBlendProperties.srcAlphaBlendFactor);
+			colorWriteMask.dstAlphaBlendFactor = VulkanUtil::getBlendFactor(attachmentColorBlendProperties.dstAlphaBlendFactor);
+			colorWriteMask.alphaBlendOp = VulkanUtil::getBlendOp(attachmentColorBlendProperties.alphaBlendOp);
+			colorWriteMask.colorWriteMask = colorMask;
+
+			colorWriteMasks[i] = (colorWriteMask);
+		}
+
+		VkPipelineColorBlendStateCreateInfo colorBlendStateInfo = {};
+		colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+		colorBlendStateInfo.pNext = 0;
+		colorBlendStateInfo.pAttachments = colorWriteMasks.data();
+		colorBlendStateInfo.attachmentCount = attachmentColorBlendPropertiesSize;
+
+		VkPipelineMultisampleStateCreateInfo multisampleStateInfo = {};
+		multisampleStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+		multisampleStateInfo.pNext = 0;
+		multisampleStateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+		multisampleStateInfo.pSampleMask = 0;
 		
-		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
-		colorBlendAttachment.blendEnable = properties.colorBlendAttachmentState.blendEnable;
-		colorBlendAttachment.srcColorBlendFactor = properties.colorBlendAttachmentState.srcColorBlendFactor;
-		colorBlendAttachment.dstColorBlendFactor = properties.colorBlendAttachmentState.dstColorBlendFactor;
-		colorBlendAttachment.colorBlendOp = properties.colorBlendAttachmentState.colorBlendOp;
-		colorBlendAttachment.srcAlphaBlendFactor = properties.colorBlendAttachmentState.srcAlphaBlendFactor;
-		colorBlendAttachment.dstAlphaBlendFactor = properties.colorBlendAttachmentState.dstAlphaBlendFactor;
-		colorBlendAttachment.alphaBlendOp = properties.colorBlendAttachmentState.alphaBlendOp;
-		colorBlendAttachment.colorWriteMask = properties.colorBlendAttachmentState.colorWriteMask;
+		VkPipelineDepthStencilStateCreateInfo depthStencilStateInfo = { };
+		depthStencilStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+		depthStencilStateInfo.pNext = NULL;
+		depthStencilStateInfo.depthTestEnable = properties.depthTestEnable;
+		depthStencilStateInfo.depthWriteEnable = properties.depthWriteEnable;
+		depthStencilStateInfo.depthCompareOp = VulkanUtil::getCompareOp(properties.depthCompareOp);
+		depthStencilStateInfo.depthBoundsTestEnable = properties.depthBoundsTestEnable;
+		depthStencilStateInfo.minDepthBounds = properties.minDepthBounds;
+		depthStencilStateInfo.maxDepthBounds = properties.maxDepthBounds;
 
-		VkPipelineColorBlendStateCreateInfo colorBlending = {};
-		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-		colorBlending.logicOpEnable = properties.colorBlendState.logicOpEnable;
-		colorBlending.logicOp = properties.colorBlendState.logicOp;
-		colorBlending.attachmentCount = properties.colorBlendState.attachmentCount;
-		colorBlending.pAttachments = &colorBlendAttachment;
-		colorBlending.blendConstants[0] = properties.colorBlendState.blendConstants[0];
-		colorBlending.blendConstants[1] = properties.colorBlendState.blendConstants[1];
-		colorBlending.blendConstants[2] = properties.colorBlendState.blendConstants[2];
-		colorBlending.blendConstants[3] = properties.colorBlendState.blendConstants[3];
+		std::vector<VkDynamicState> dynamicStates;
+		if (properties.dynamicViewPort)
+		{
+			dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+		}
+		if (properties.dynamicScissor) {
+			dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+		}
+		if (properties.dynamicLineWidth) {
+			dynamicStates.push_back(VK_DYNAMIC_STATE_LINE_WIDTH);
+		}
+		if (properties.dynamicDepthBias) {
+			dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_BIAS);
+		}
+		if (properties.dynamicBlendConstants) {
+			dynamicStates.push_back(VK_DYNAMIC_STATE_BLEND_CONSTANTS);
+		}
+		if (properties.dynamicDepthBounds) {
+			dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_BOUNDS);
+		}
 
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
-		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = properties.layoutInfo.setLayoutCount;
-		pipelineLayoutInfo.pushConstantRangeCount = properties.layoutInfo.pushConstantRangeCount;
-		
-		VkPipelineLayout pipelineLayout;
+		VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
+		dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		dynamicStateCreateInfo.pNext = NULL;
+		dynamicStateCreateInfo.flags = 0;
+		dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+		dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 
-		if (vkCreatePipelineLayout(internal, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+		/*if (vkCreatePipelineLayout(internal, VK_NULL_HANDLE, nullptr, &pipelineLayout) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
+		}*/
+
+		VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
+		pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipelineCreateInfo.pNext = NULL;
+		pipelineCreateInfo.layout = NULL; // TODO
+		pipelineCreateInfo.renderPass = renderPass;
+		pipelineCreateInfo.pVertexInputState = &vertexInputInfo;
+		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateInfo;
+		pipelineCreateInfo.pRasterizationState = &rasterizationStateInfo;
+		pipelineCreateInfo.pColorBlendState = &colorBlendStateInfo;
+		pipelineCreateInfo.pMultisampleState = &multisampleStateInfo;
+		pipelineCreateInfo.pViewportState = &viewportStateInfo;
+		pipelineCreateInfo.pDepthStencilState = &depthStencilStateInfo;
+		pipelineCreateInfo.pStages = NULL; // TODO
+		pipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
+
+		VkPipeline pipeline;
+
+		VkResult result = vkCreateGraphicsPipelines(internal, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
+		if (result != VK_SUCCESS) {
+			Logging::showError("Failed to create graphics pipeline: " + VulkanUtil::translateVulkanResult(result));			
 		}
 
-		VkGraphicsPipelineCreateInfo pipelineInfo = {};
-		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		pipelineInfo.stageCount = 2;
-		pipelineInfo.pStages = shaderStages.data();
-		pipelineInfo.pVertexInputState = &vertexInputInfo;
-		pipelineInfo.pInputAssemblyState = &inputAssembly;
-		pipelineInfo.pViewportState = &viewportState;
-		pipelineInfo.pRasterizationState = &rasterizer;
-		pipelineInfo.pMultisampleState = &multisampling;
-		pipelineInfo.pColorBlendState = &colorBlending;
-		pipelineInfo.layout = pipelineLayout;
-		//pipelineInfo.renderPass = renderPass;
-		pipelineInfo.subpass = 0;
-		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-
-		Pipeline pipeline;
-
-		if (vkCreateGraphicsPipelines(internal, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create graphics pipeline!");
-		}
-
-		for (uint i = 0; i < properties.shaderStages.size(); i++)
+		/*for (uint i = 0; i < properties.shaderStages.size(); i++)
 		{
 			DestroyShaderStage(properties.shaderStages[i]);
-		}
+		}*/
 
-		return Pipeline();
+		return VkPipeline();
 	}
 
-	const Image LogicalDevice::CreateImage(const ImageType& imageType, const ImageFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const
+	const Image LogicalDevice::CreateImage(const ImageType& imageType, const VkFormat& format, const uint& mipLevels, const uint& arrayLevels, const uint& width, const uint& height, const uint& depth, const ImageUsageFlags& usageFlags) const
 	{
 		ImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
@@ -220,13 +346,13 @@ namespace Vulkan
 		VkImage image;
 		VkResult result = vkCreateImage(internal, &createInfo, nullptr, &image);
 		if (result != VK_SUCCESS) {
-			std::cerr << "Failed to create image: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to create image: " + VulkanUtil::translateVulkanResult(result));
 		}
 
 		return Image(image, imageType, layout, width, height, depth);
 	}
 
-	const ImageView LogicalDevice::CreateImageView(const Image& image, const ImageFormat& format, const ImageAspectFlags& aspectFlags) const
+	const VkImageView LogicalDevice::CreateImageView(const Image& image, const VkFormat& format, const VkImageAspectFlags& aspectFlags) const
 	{
 
 		VkImageViewCreateInfo createInfo = {};
@@ -247,11 +373,11 @@ namespace Vulkan
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
 
-		ImageView imageView;
+		VkImageView imageView;
 
 		VkResult result = vkCreateImageView(internal, &createInfo, nullptr, &imageView);
 		if (result != VK_SUCCESS) {
-			std::cerr << "Failed to create Image view: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to create Image view: " + VulkanUtil::translateVulkanResult(result));
 		}
 
 		return imageView;
@@ -268,12 +394,31 @@ namespace Vulkan
 
 		VkResult result = vkCreateShaderModule(internal, &createInfo, nullptr, &shaderModule);
 		if (result != VK_SUCCESS) {
-			std::cerr << "Failed to create Shader Module: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to create Shader Module: " + VulkanUtil::translateVulkanResult(result));
 		}
+
+		
 
 		return ShaderStage(shaderModule, shaderType);
 	}
 		
+	const Queue& LogicalDevice::GetDeviceQueue(const uint queueFamilyIndex, const uint queueIndex)
+	{
+		std::string key = queueFamilyIndex + ":" + queueIndex;
+		auto iter = deviceQueues.find(key);
+		if (iter == deviceQueues.end())
+		{
+			VkQueue internalQueue;
+			vkGetDeviceQueue(internal, queueFamilyIndex, queueIndex, &internalQueue); 
+			const Queue queue = Queue(internalQueue, *this);
+			deviceQueues.emplace(key, queue);
+
+			return queue;
+		}
+
+		return iter->second;
+	}
+
 	void LogicalDevice::DestroyShaderStage(const ShaderStage& module)
 	{
 		vkDestroyShaderModule(internal, module.GetModule(), 0);

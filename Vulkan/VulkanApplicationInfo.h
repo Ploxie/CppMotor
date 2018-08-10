@@ -1,5 +1,5 @@
 #pragma once
-#include <BasicTypes.h>
+#include "stdafx.h"
 #include "VulkanVersion.h"
 
 namespace Vulkan

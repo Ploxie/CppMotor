@@ -1,6 +1,5 @@
-#include "VulkanPhysicalDevice.h"
 #include "stdafx.h"
-#include <iostream>
+#include "VulkanPhysicalDevice.h"
 #include "VulkanUtil.h"
 #include "VulkanQueueFamilyIndices.h"
 
@@ -29,87 +28,109 @@ namespace Vulkan
 			vkEnumerateDeviceExtensionProperties(physicalDevice, 0, &extensionCount, supportedExtensions.data());
 		}
 	}
-
-	const LogicalDevice PhysicalDevice::CreateLogicalDevice(const PhysicalDeviceFeatures& enabledFeatures, const std::vector<const char*>& extensions, const QueueFlags& queueFlags) const
+	
+	const ILogicalGraphicsDevice PhysicalDevice::CreateLogicalDevice(const std::vector<std::string>& extensions, const uint graphicsQueueCount, const uint computeQueueCount) const
 	{
+		VkQueueFlags requestedQueueTypes = VK_QUEUE_TRANSFER_BIT;
+		if (graphicsQueueCount > 0)
+		{
+			requestedQueueTypes |= VK_QUEUE_GRAPHICS_BIT;
+		}
+		if (computeQueueCount > 0)
+		{
+			requestedQueueTypes |= VK_QUEUE_COMPUTE_BIT;
+		}
+
+		VkPhysicalDeviceFeatures enabledFeatures = features;
+
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos = {};
 		const float queuePriority = 0.0f;
+
+		QueuesInfo queuesInfo = {};
+
+		if (requestedQueueTypes & VK_QUEUE_GRAPHICS_BIT)
+		{
+			queuesInfo.graphicsIndex = GetQueueFamilyIndex(VK_QUEUE_GRAPHICS_BIT);
+			queuesInfo.graphicsQueueCount = graphicsQueueCount;
+
+			VkDeviceQueueCreateInfo queueInfo = {};
+			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueInfo.queueFamilyIndex = queuesInfo.graphicsIndex;
+			queueInfo.queueCount = graphicsQueueCount;
+			queueInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(queueInfo);
+		}
+
+		if (requestedQueueTypes & VK_QUEUE_COMPUTE_BIT)
+		{
+			queuesInfo.computeIndex = GetQueueFamilyIndex(VK_QUEUE_COMPUTE_BIT);
+			queuesInfo.computeQueueCount = computeQueueCount;
+
+			VkDeviceQueueCreateInfo queueInfo = {};
+			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueInfo.queueFamilyIndex = queuesInfo.computeIndex;
+			queueInfo.queueCount = computeQueueCount;
+			queueInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(queueInfo);
+		}
+		else
+		{
+			queuesInfo.computeIndex = queuesInfo.graphicsIndex;
+			queuesInfo.computeQueueCount = graphicsQueueCount;
+		}
+
+		if (requestedQueueTypes & VK_QUEUE_TRANSFER_BIT)
+		{
+			queuesInfo.transferIndex = GetQueueFamilyIndex(VK_QUEUE_TRANSFER_BIT);
+			queuesInfo.transferQueueCount = 1;
+
+			VkDeviceQueueCreateInfo queueInfo = {};
+			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueInfo.queueFamilyIndex = queuesInfo.transferIndex;
+			queueInfo.queueCount = 1;
+			queueInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(queueInfo);
+		}
+		else
+		{
+			queuesInfo.transferIndex = queuesInfo.graphicsIndex;
+			queuesInfo.transferQueueCount = graphicsQueueCount;
+		}
 		
-		QueueFamilyIndices queueFamilyIndices = {};
-
-		if (queueFlags & VK_QUEUE_GRAPHICS_BIT)
-		{
-			queueFamilyIndices.graphics = GetQueueFamilyIndex(VK_QUEUE_GRAPHICS_BIT);
-
-			VkDeviceQueueCreateInfo queueInfo = {};
-			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueInfo.queueFamilyIndex = queueFamilyIndices.graphics;
-			queueInfo.queueCount = 1;
-			queueInfo.pQueuePriorities = &queuePriority;
-
-			queueCreateInfos.push_back(queueInfo);
+		uint extensionSize = static_cast<uint>(extensions.size());
+		std::vector<const char*> enabledExtensions(extensionSize);
+		for (uint i = 0; i < extensionSize; i++) {
+			enabledExtensions[i] = extensions[i].c_str();
 		}
 
-		if (queueFlags & VK_QUEUE_COMPUTE_BIT)
-		{
-			queueFamilyIndices.compute = GetQueueFamilyIndex(VK_QUEUE_COMPUTE_BIT);
-
-			VkDeviceQueueCreateInfo queueInfo = {};
-			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueInfo.queueFamilyIndex = queueFamilyIndices.compute;
-			queueInfo.queueCount = 1;
-			queueInfo.pQueuePriorities = &queuePriority;
-
-			queueCreateInfos.push_back(queueInfo);
-		}
-		else
-		{
-			queueFamilyIndices.compute = queueFamilyIndices.graphics;
-		}
-
-		if (queueFlags & VK_QUEUE_TRANSFER_BIT)
-		{
-			queueFamilyIndices.transfer = GetQueueFamilyIndex(VK_QUEUE_TRANSFER_BIT);
-
-			VkDeviceQueueCreateInfo queueInfo = {};
-			queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueInfo.queueFamilyIndex = queueFamilyIndices.transfer;
-			queueInfo.queueCount = 1;
-			queueInfo.pQueuePriorities = &queuePriority;
-
-			queueCreateInfos.push_back(queueInfo);
-		}
-		else
-		{
-			queueFamilyIndices.transfer = queueFamilyIndices.graphics;
-		}
-				
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceCreateInfo.queueCreateInfoCount = static_cast<uint>(queueCreateInfos.size());		
+		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.enabledExtensionCount = static_cast<uint>(extensions.size());
-		deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
 		deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+		deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensionSize);
+		deviceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
 
 		VkDevice device;
 
 		VkResult result = vkCreateDevice(internal, &deviceCreateInfo, nullptr, &device);
 		if (result != VK_SUCCESS) {
-			std::cerr << "Failed to create logical device: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to create logical device: " + VulkanUtil::translateVulkanResult(result));
 		}
 
-
-		return LogicalDevice(device,*this, queueFamilyIndices);
+		return LogicalDevice(device, *this, queuesInfo);
 	}
 
-	const SurfaceProperties PhysicalDevice::GetSurfaceProperties(const Surface& surface) const
+	const SurfaceProperties PhysicalDevice::GetSurfaceProperties(const VkSurfaceKHR& surface) const
 	{
 		SurfaceProperties properties = {};
 		VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(internal, surface, &properties.capabilities);
 		if (result != VK_SUCCESS)
 		{
-			std::cerr << "Failed to get Surface capabilities: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to get Surface capabilities: " + VulkanUtil::translateVulkanResult(result));
 		}
 
 		uint presentModeCount = 0;
@@ -119,7 +140,7 @@ namespace Vulkan
 		result = vkGetPhysicalDeviceSurfacePresentModesKHR(internal, surface, &presentModeCount, properties.presentModes.data());
 		if (result != VK_SUCCESS)
 		{
-			std::cerr << "Failed to get Surface present Modes: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to get Surface present Modes: " + VulkanUtil::translateVulkanResult(result));
 		}
 
 		uint formatCount = 0;
@@ -129,7 +150,7 @@ namespace Vulkan
 		result = vkGetPhysicalDeviceSurfaceFormatsKHR(internal, surface, &formatCount, properties.formats.data());
 		if (result != VK_SUCCESS)
 		{
-			std::cerr << "Failed to get Surface Formats: " << translateVulkanResult(result) << std::endl;
+			Logging::showError("Failed to get Surface Formats: " + VulkanUtil::translateVulkanResult(result));
 		}
 
 		return properties;
@@ -180,7 +201,7 @@ namespace Vulkan
 	{
 		for (uint i = 0; i < supportedExtensions.size(); i++)
 		{
-			const ExtensionProperties& ext = supportedExtensions[i];
+			const VkExtensionProperties& ext = supportedExtensions[i];
 			if (std::strcmp(ext.extensionName, extension) && ext.specVersion >= minVersion)
 			{
 				return true;
@@ -189,7 +210,7 @@ namespace Vulkan
 		return false;
 	}
 
-	const int PhysicalDevice::GetPresentQueueFamilyIndex(const Surface& surface) const
+	const int PhysicalDevice::GetPresentQueueFamilyIndex(const VkSurfaceKHR& surface) const
 	{
 		int index = -1;
 

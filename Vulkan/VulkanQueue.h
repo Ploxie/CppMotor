@@ -3,19 +3,17 @@
 
 namespace Vulkan
 {
+	class LogicalDevice;
+
 	class Queue
 	{
 	public:
-		inline Queue();
-		Queue(const VkQueue& internal);
+		Queue(const VkQueue& queue, const LogicalDevice& logicalDevice);
 
 	private:
-		VkQueue internal;
-		float f;
+		const VkQueue internal;
+		const LogicalDevice& logicalDevice;
 	};
 
-	inline Queue::Queue() : internal(0)
-	{
-
-	}
+	
 }

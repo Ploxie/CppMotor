@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include <BasicTypes.h>
 
 namespace Vulkan
 {

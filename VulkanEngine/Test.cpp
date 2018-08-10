@@ -47,7 +47,7 @@ int main()
 
 	glfwInit();
 
-	Window* window = new GLFWWindow(800, 600, "ASD", WINDOWED);
+	GLFWWindow* window = new GLFWWindow(800, 600, "ASD", WINDOWED);
 	window->Create();
 
 	Vulkan::ApplicationInfo appInfo = {};
@@ -63,7 +63,7 @@ int main()
 	properties.layers = {};
 
 	Vulkan::Instance instance(properties);
-	Vulkan::Surface surface = instance.CreateSurface(window->GetHandle());
+	Vulkan::Surface surface = instance.CreateSurface(*window);
 
 	std::vector<Vulkan::PhysicalDevice> physicalDevices = instance.GetPhysicalDevices();
 
